@@ -27,7 +27,7 @@ export default function Navbar() {
           <span className="brand-mark">
             <Image
               src={referenceImages.logo}
-              alt="Temporary logo placeholder; replace with Victor’s mark"
+              alt="Ven. Victor Akpevwen Onosemuode Logo"
               width={1000}
               height={390}
             />

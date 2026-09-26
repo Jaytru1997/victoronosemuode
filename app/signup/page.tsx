@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { UserPlus, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 export default function SignupPage() {
@@ -81,21 +82,16 @@ export default function SignupPage() {
         }}
       >
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "48px",
-              height: "48px",
-              borderRadius: "50%",
-              background: "#1e3a8a",
-              color: "#f8fafc",
-              marginBottom: "1rem",
-            }}
-          >
-            <UserPlus size={22} />
-          </span>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
+            <Image
+              src="/logo.jpg"
+              alt="Victor Onosemuode Logo"
+              width={140}
+              height={60}
+              style={{ objectFit: "contain", maxHeight: "60px", width: "auto", borderRadius: "6px" }}
+              priority
+            />
+          </div>
           <h1 style={{ fontSize: "1.75rem", fontWeight: "700", color: "#0f172a", marginBottom: "0.5rem" }}>
             Create an Account
           </h1>

@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="footer-main">
           <div className="footer-brand">
             <Link href="/" className="brand" aria-label="Victor Onosemuode home">
-              <span className="brand-mark"><Image src={referenceImages.logo} alt="Temporary logo placeholder; replace with Victor’s mark" width={1000} height={390} /></span>
+              <span className="brand-mark"><Image src={referenceImages.logo} alt="Ven. Victor Akpevwen Onosemuode Logo" width={1000} height={390} /></span>
               <span className="brand-copy"><span className="brand-name">Victor Onosemuode</span><span className="brand-tagline">Anglican priest · Teacher · Author</span></span>
             </Link>
             <p>Ven. Victor Akpevwen Onosemuode JP. A life of Christian faith, teaching, ministry, and service to the community.</p>
