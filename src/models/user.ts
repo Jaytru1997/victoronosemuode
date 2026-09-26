@@ -29,10 +29,14 @@ export async function createUser(user: Omit<User, "_id">) {
   return result.insertedId;
 }
 
-/** Find a user by email */
+/** Find a user by email (case-insensitive) */
 export async function findUserByEmail(email: string) {
   const collection = await getUsersCollection();
-  return collection.findOne({ email: email.toLowerCase().trim() });
+  const cleanEmail = email.trim();
+  const escaped = cleanEmail.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+  return collection.findOne({
+    email: { $regex: new RegExp(`^${escaped}$`, "i") },
+  });
 }
 
 /** Find a user by ID */
