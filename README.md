@@ -17,9 +17,9 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/about` shares his biography and life timeline.
 - `/resources` presents the five legacy books.
 - `/services` describes vestments, Christian books, counselling, and priestly mentorship.
-- `/twsc` covers his ministry journey and church appointments.
-- `/blog` presents community impact, achievements, and recognition.
-- `/donate` presents community service and the St. Barnabas’ centenary project.
+- `/ministry` covers his ministry journey and church appointments.
+- `/legacy` presents community impact, achievements, and recognition.
+- `/community` presents community service and the St. Barnabas’ centenary project.
 - `/contact` lists both locations, phone numbers, and email.
 
 The supplied profile is the source of the biographical and contact content. Temporary images from the Sam Chand reference are collected in [`src/data/reference-images.ts`](src/data/reference-images.ts); replace those URLs with Victor’s image resources when available. Their alt text identifies them as temporary placeholders.
