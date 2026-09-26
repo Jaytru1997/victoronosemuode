@@ -3,34 +3,47 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, Mail, ArrowRight, ShieldCheck, UserCheck, BookOpen } from "lucide-react";
+import { UserPlus, Mail, Lock, User, ArrowRight } from "lucide-react";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match. Please verify and try again.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Login failed. Please check your credentials.");
+        throw new Error(data.error || "Failed to create account.");
       }
 
-      // Successfully logged in
+      // Automatically logged in, direct to dashboard
       router.push("/dashboard");
       router.refresh();
     } catch (err: unknown) {
@@ -44,13 +57,18 @@ export default function LoginPage() {
     }
   };
 
-  const fillQuickAccount = (quickEmail: string, quickPass: string) => {
-    setEmail(quickEmail);
-    setPassword(quickPass);
-  };
-
   return (
-    <div className="page-width" style={{ padding: "4rem 1.5rem", minHeight: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+    <div
+      className="page-width"
+      style={{
+        padding: "4rem 1.5rem",
+        minHeight: "80vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <div
         style={{
           width: "100%",
@@ -71,18 +89,18 @@ export default function LoginPage() {
               width: "48px",
               height: "48px",
               borderRadius: "50%",
-              background: "#1e293b",
+              background: "#1e3a8a",
               color: "#f8fafc",
               marginBottom: "1rem",
             }}
           >
-            <Lock size={22} />
+            <UserPlus size={22} />
           </span>
           <h1 style={{ fontSize: "1.75rem", fontWeight: "700", color: "#0f172a", marginBottom: "0.5rem" }}>
-            Portal Sign In
+            Create an Account
           </h1>
           <p style={{ color: "#64748b", fontSize: "0.95rem" }}>
-            Log in to manage ministry posts, resources, or your profile.
+            Sign up to access your purchased books, ministry resources, and study materials.
           </p>
         </div>
 
@@ -102,7 +120,45 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.15rem" }}>
+          <div>
+            <label
+              htmlFor="name"
+              style={{ display: "block", fontSize: "0.875rem", fontWeight: "600", color: "#334155", marginBottom: "0.4rem" }}
+            >
+              Full Name (Optional)
+            </label>
+            <div style={{ position: "relative" }}>
+              <span
+                style={{
+                  position: "absolute",
+                  left: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#94a3b8",
+                  pointerEvents: "none",
+                }}
+              >
+                <User size={18} />
+              </span>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. John Doe"
+                style={{
+                  width: "100%",
+                  padding: "0.75rem 1rem 0.75rem 2.5rem",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "0.95rem",
+                  outline: "none",
+                }}
+              />
+            </div>
+          </div>
+
           <div>
             <label
               htmlFor="email"
@@ -168,7 +224,46 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Minimum 6 characters"
+                style={{
+                  width: "100%",
+                  padding: "0.75rem 1rem 0.75rem 2.5rem",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "0.95rem",
+                  outline: "none",
+                }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              style={{ display: "block", fontSize: "0.875rem", fontWeight: "600", color: "#334155", marginBottom: "0.4rem" }}
+            >
+              Confirm Password
+            </label>
+            <div style={{ position: "relative" }}>
+              <span
+                style={{
+                  position: "absolute",
+                  left: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#94a3b8",
+                  pointerEvents: "none",
+                }}
+              >
+                <Lock size={18} />
+              </span>
+              <input
+                id="confirmPassword"
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter password"
                 style={{
                   width: "100%",
                   padding: "0.75rem 1rem 0.75rem 2.5rem",
@@ -201,93 +296,19 @@ export default function LoginPage() {
               marginTop: "0.5rem",
             }}
           >
-            {loading ? "Authenticating..." : "Sign In"}
+            {loading ? "Creating Account..." : "Create Account"}
             {!loading && <ArrowRight size={18} />}
           </button>
         </form>
 
-        <div style={{ textAlign: "center", marginTop: "1.25rem", fontSize: "0.9rem", color: "#64748b" }}>
-          Don&apos;t have an account?{" "}
-          <Link href="/signup" style={{ color: "#1e3a8a", fontWeight: "600", textDecoration: "underline" }}>
-            Create an Account
+        <div style={{ textAlign: "center", marginTop: "1.75rem", fontSize: "0.9rem", color: "#64748b" }}>
+          Already have an account?{" "}
+          <Link href="/login" style={{ color: "#1e3a8a", fontWeight: "600", textDecoration: "underline" }}>
+            Sign In
           </Link>
         </div>
 
-        {/* Demo Fast Login Pills */}
-        <div style={{ marginTop: "1.75rem", borderTop: "1px solid #e2e8f0", paddingTop: "1.5rem" }}>
-          <p style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: "600", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Quick Demo Accounts
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <button
-              type="button"
-              onClick={() => fillQuickAccount("admin@example.com", "Admin@123")}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #e2e8f0",
-                background: "#f8fafc",
-                fontSize: "0.85rem",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
-            >
-              <span style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontWeight: "600", color: "#1e293b" }}>
-                <ShieldCheck size={16} color="#7c3aed" /> Admin Profile
-              </span>
-              <span style={{ color: "#64748b", fontSize: "0.78rem" }}>Admin@123</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => fillQuickAccount("manager@example.com", "Manager@123")}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #e2e8f0",
-                background: "#f8fafc",
-                fontSize: "0.85rem",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
-            >
-              <span style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontWeight: "600", color: "#1e293b" }}>
-                <UserCheck size={16} color="#059669" /> Manager Profile
-              </span>
-              <span style={{ color: "#64748b", fontSize: "0.78rem" }}>Manager@123</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => fillQuickAccount("user@example.com", "User@123")}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #e2e8f0",
-                background: "#f8fafc",
-                fontSize: "0.85rem",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
-            >
-              <span style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontWeight: "600", color: "#1e293b" }}>
-                <BookOpen size={16} color="#2563eb" /> User Profile
-              </span>
-              <span style={{ color: "#64748b", fontSize: "0.78rem" }}>User@123</span>
-            </button>
-          </div>
-        </div>
-
-        <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
+        <div style={{ textAlign: "center", marginTop: "1rem" }}>
           <Link href="/" style={{ fontSize: "0.85rem", color: "#64748b", textDecoration: "underline" }}>
             Return to Victor Onosemuode Home
           </Link>

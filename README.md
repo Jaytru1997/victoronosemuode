@@ -30,3 +30,20 @@ The supplied profile is the source of the biographical and contact content. Temp
 npm run lint
 npm run build
 ```
+
+## Authentication & Authorization
+
+This project uses **MongoDB** for persistence and **JWT** for authentication.
+
+### Roles
+- **Admin** – full access to all resources.
+- **Manager** – can create, edit, delete posts and manage users.
+- **User** – can view purchased items (books, resources).
+
+### Required environment variables
+```dotenv
+MONGODB_URI=your-mongodb-connection-string
+JWT_SECRET=your-jwt-secret
+```
+
+See the `src/lib/mongodb.ts` and `src/models` directory for the connection logic and schema definitions.
