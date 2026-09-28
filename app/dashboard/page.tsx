@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ShieldAlert,
   UserCheck,
@@ -283,11 +284,23 @@ export default function DashboardPage() {
           boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
         }}
       >
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-            <h1 style={{ fontSize: "1.5rem", fontWeight: "700", color: "#0f172a", margin: 0 }}>
-              Management Portal
-            </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
+          <Link href="/" title="Return to Website" style={{ display: "inline-flex", alignItems: "center" }}>
+            <Image
+              src="/logo.png"
+              alt="Ven. Victor Akpevwen Onosemuode Logo"
+              width={160}
+              height={55}
+              style={{ objectFit: "contain", maxHeight: "44px", width: "auto" }}
+              priority
+            />
+          </Link>
+          <div style={{ width: "1px", height: "36px", background: "#e2e8f0" }} />
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
+              <h1 style={{ fontSize: "1.4rem", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                Management Portal
+              </h1>
             <span
               style={{
                 textTransform: "uppercase",
@@ -304,9 +317,10 @@ export default function DashboardPage() {
               {user.role}
             </span>
           </div>
-          <p style={{ color: "#64748b", fontSize: "0.9rem", margin: 0 }}>
-            Logged in as: <strong>{user.email}</strong>
-          </p>
+            <p style={{ color: "#64748b", fontSize: "0.9rem", margin: 0 }}>
+              Logged in as: <strong>{user.email}</strong>
+            </p>
+          </div>
         </div>
 
         <button

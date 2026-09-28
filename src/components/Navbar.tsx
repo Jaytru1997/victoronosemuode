@@ -28,12 +28,12 @@ export default function Navbar() {
             <Image
               src={referenceImages.logo}
               alt="Ven. Victor Akpevwen Onosemuode Logo"
-              width={1000}
-              height={390}
+              width={168}
+              height={57}
+              priority
             />
           </span>
           <span className="brand-copy">
-            <span className="brand-name">Victor Onosemuode</span>
             <span className="brand-tagline">Anglican priest · Teacher · Author</span>
           </span>
         </Link>

@@ -2,7 +2,7 @@ const storefront = "https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-
 const bookshelf = "https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/themes/1004502/settings_images";
 
 export const referenceImages = {
-  logo: "/logo.jpg",
+  logo: "/logo.png",
   hero: `${storefront}/6ZpGukR8R7mi2UlvL1r0_SC_header_sam4.jpg`,
   portrait: `${storefront}/IYu2Tv1RPy8cuYXLTanf_samchand.jpg`,
   institute: `${storefront}/I0KfG9GpRAKdl1RBpNhg_SCLI-pwyc-Offer.png`,
@@ -20,7 +20,7 @@ export const referenceImages = {
   ],
   culture: `${storefront}/JUwe6soQBGQL9p3EHjEz_SC-CS-header.jpg`,
   consulting: `${storefront}/X9xlZvujR6aHjVH0kMZf_EXPAND-website_header.jpg`,
-  consultingLogo: "/logo.jpg",
+  consultingLogo: "/logo.png",
   endorsements: [
     `${storefront}/ITZRAczMRoGKx3ViMChw_SC_endorsement1.png`,
     `${storefront}/tKRdv2CLQDC8M7HOcgdV_SC_endorsement2.png`,

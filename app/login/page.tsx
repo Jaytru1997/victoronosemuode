@@ -65,14 +65,16 @@ export default function LoginPage() {
       >
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
-            <Image
-              src="/logo.jpg"
-              alt="Victor Onosemuode Logo"
-              width={140}
-              height={60}
-              style={{ objectFit: "contain", maxHeight: "60px", width: "auto", borderRadius: "6px" }}
-              priority
-            />
+            <Link href="/" title="Back to home" style={{ display: "inline-block" }}>
+              <Image
+                src="/logo.png"
+                alt="Ven. Victor Akpevwen Onosemuode Logo"
+                width={190}
+                height={65}
+                style={{ objectFit: "contain", maxHeight: "60px", width: "auto" }}
+                priority
+              />
+            </Link>
           </div>
           <h1 style={{ fontSize: "1.75rem", fontWeight: "700", color: "#0f172a", marginBottom: "0.5rem" }}>
             Portal Sign In
