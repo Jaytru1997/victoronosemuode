@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Navbar from "@/src/components/Navbar";
-import Footer from "@/src/components/Footer"
+import Footer from "@/src/components/Footer";
+import { CartProvider } from "@/src/context/CartContext";
+import CartDrawer from "@/src/components/CartDrawer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,9 +32,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <CartProvider>
+          <Navbar />
+          <CartDrawer />
+          <main>{children}</main>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

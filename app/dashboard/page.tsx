@@ -17,13 +17,32 @@ import {
   PlusCircle,
   Download,
   ExternalLink,
+  Library,
+  ShoppingBag,
+  Check,
 } from "lucide-react";
+import { useCart } from "@/src/context/CartContext";
 
 interface CurrentUser {
   id: string;
   email: string;
   role: "admin" | "manager" | "user";
   purchasedItems: string[];
+}
+
+interface BookAdminItem {
+  _id: string;
+  title: string;
+  note: string;
+  price: number;
+  currency?: string;
+  coverImage: string;
+  tone?: string;
+  category?: string;
+  author?: string;
+  createdAt?: string;
+  format?: string;
+  pages?: string;
 }
 
 interface PostItem {
@@ -43,27 +62,71 @@ interface UserItem {
   createdAt?: string;
 }
 
-const defaultBooks = [
+const authenticDefaultBooks: BookAdminItem[] = [
   {
-    id: "bk-1",
-    title: "The Christian & Politics: A Practical Guide to Faith in Public Life",
-    type: "eBook (PDF)",
+    _id: "seed-1",
+    title: "The Handbook for Conducting Annual Vestry Meetings",
+    category: "Church Administration",
+    note: "A practical handbook for church administration, vestry procedures, and annual parish meetings.",
+    price: 3500,
+    currency: "NGN",
+    coverImage: "/annual-vestry-meeting-poster.png",
+    tone: "book-green",
+    author: "Ven. Victor A. Onosemuode JP",
+    format: "Print & Study Guide (PDF)",
+    pages: "148 Pages",
+  },
+  {
+    _id: "seed-2",
+    title: "My Patmos",
+    category: "Daily Devotional",
+    note: "God Speaks – A personal work among the five legacy books written to nurture faith and Christian devotion.",
+    price: 4000,
+    currency: "NGN",
+    coverImage: "/my-patmos-poster.png",
+    tone: "book-ochre",
+    author: "Ven. Victor A. Onosemuode JP",
+    format: "Hardcover & Devotional eBook",
     pages: "184 Pages",
-    access: "full",
   },
   {
-    id: "bk-2",
-    title: "Divine Provision in Times of Scarcity: Biblical Principles for Today",
-    type: "eBook + Study Guide",
-    pages: "220 Pages",
-    access: "full",
+    _id: "seed-3",
+    title: "The Hymnfinder",
+    category: "Hymnology & Worship",
+    note: "A comprehensive reference resource for discovering hymns and enriching congregational worship.",
+    price: 5000,
+    currency: "NGN",
+    coverImage: "/the-hymnfinder-poster.png",
+    tone: "book-rust",
+    author: "Ven. Victor A. Onosemuode JP",
+    format: "Complete Hymnal Reference Index",
+    pages: "312 Pages",
   },
   {
-    id: "bk-3",
-    title: "Living a Life of Integrity in an Uncompromising World",
-    type: "Audio Devotional + eBook",
+    _id: "seed-4",
+    title: "Youth and Children Hymn Book",
+    category: "Youth & School Ministry",
+    note: "Containing hymns and spiritual songs for youth services, assemblies, conventions, and school devotions.",
+    price: 3000,
+    currency: "NGN",
+    coverImage: "/youth-children-hymn-book-poster.png",
+    tone: "book-blue",
+    author: "Ven. Victor A. Onosemuode JP",
+    format: "Youth Hymnal & Musical Notation",
     pages: "160 Pages",
-    access: "full",
+  },
+  {
+    _id: "seed-5",
+    title: "Historical Encounter of Some Hymn Writers",
+    category: "Hymn History & Biographies",
+    note: "Inspiring biographies of hymn writers and composers, accompanied by scriptures and historical context.",
+    price: 4500,
+    currency: "NGN",
+    coverImage: "/historical-encounter-poster.webp",
+    tone: "book-plum",
+    author: "Ven. Victor A. Onosemuode JP",
+    format: "Biographical Anthology & Reflections",
+    pages: "228 Pages",
   },
 ];
 
@@ -71,7 +134,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"posts" | "users" | "resources">("resources");
+  const [activeTab, setActiveTab] = useState<"posts" | "books" | "users" | "resources">("resources");
 
   // Posts state
   const [posts, setPosts] = useState<PostItem[]>([]);
@@ -82,6 +145,18 @@ export default function DashboardPage() {
   const [posting, setPosting] = useState(false);
   const [postMessage, setPostMessage] = useState<string | null>(null);
 
+  // Books state for managers and admins
+  const [booksAdminList, setBooksAdminList] = useState<BookAdminItem[]>([]);
+  const [newBookTitle, setNewBookTitle] = useState("");
+  const [newBookNote, setNewBookNote] = useState("");
+  const [newBookPrice, setNewBookPrice] = useState("3500");
+  const [newBookCategory, setNewBookCategory] = useState("Church Administration");
+  const [newBookTone, setNewBookTone] = useState("book-green");
+  const [newBookCover, setNewBookCover] = useState("/annual-vestry-meeting-poster.png");
+  const [newBookAuthor, setNewBookAuthor] = useState("Ven. Victor A. Onosemuode JP");
+  const [bookSaving, setBookSaving] = useState(false);
+  const [bookAdminMessage, setBookAdminMessage] = useState<string | null>(null);
+
   // Users state
   const [usersList, setUsersList] = useState<UserItem[]>([]);
   const [newEmail, setNewEmail] = useState("");
@@ -89,6 +164,10 @@ export default function DashboardPage() {
   const [newRole, setNewRole] = useState<"admin" | "manager" | "user">("user");
   const [userMessage, setUserMessage] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+
+  const { addToCart, formatPrice } = useCart();
+  const [userBooks, setUserBooks] = useState<BookAdminItem[]>(authenticDefaultBooks);
+  const [addedBookId, setAddedBookId] = useState<string | null>(null);
 
   // Load user session
   useEffect(() => {
@@ -120,13 +199,31 @@ export default function DashboardPage() {
     loadSession();
   }, [router]);
 
-  // Load posts when activeTab is posts
+  // Load posts, books, or users based on activeTab
   useEffect(() => {
     if (activeTab === "posts") {
       fetch("/api/posts")
         .then((r) => r.json())
         .then((d) => {
           if (d.posts) setPosts(d.posts);
+        })
+        .catch(console.error);
+    }
+    if (activeTab === "books" && (user?.role === "admin" || user?.role === "manager")) {
+      fetch("/api/books")
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.books) setBooksAdminList(d.books);
+        })
+        .catch(console.error);
+    }
+    if (activeTab === "resources") {
+      fetch("/api/books")
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.books && d.books.length > 0) {
+            setUserBooks(d.books);
+          }
         })
         .catch(console.error);
     }
@@ -139,6 +236,20 @@ export default function DashboardPage() {
         .catch(console.error);
     }
   }, [activeTab, user]);
+
+  const handleAddToCartInDashboard = (book: BookAdminItem) => {
+    addToCart({
+      id: book._id,
+      title: book.title,
+      price: book.price || 3500,
+      currency: book.currency || "NGN",
+      coverImage: book.coverImage || "/annual-vestry-meeting-poster.png",
+    });
+    setAddedBookId(book._id);
+    setTimeout(() => {
+      setAddedBookId(null);
+    }, 1800);
+  };
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -196,6 +307,68 @@ export default function DashboardPage() {
       }
     } catch (err) {
       console.error("Failed to delete post:", err);
+    }
+  };
+
+  const handleCreateBook = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBookTitle || !newBookNote) return;
+
+    setBookSaving(true);
+    setBookAdminMessage(null);
+
+    try {
+      const res = await fetch("/api/books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newBookTitle,
+          note: newBookNote,
+          price: parseFloat(newBookPrice) || 3500,
+          currency: "NGN",
+          coverImage: newBookCover,
+          tone: newBookTone,
+          category: newBookCategory,
+          author: newBookAuthor,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add book");
+
+      setBookAdminMessage("✅ Book added to database catalog successfully!");
+      setNewBookTitle("");
+      setNewBookNote("");
+      setNewBookPrice("3500");
+
+      // Refresh list
+      const r = await fetch("/api/books");
+      const d = await r.json();
+      if (d.books) setBooksAdminList(d.books);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setBookAdminMessage(`❌ ${err.message}`);
+      } else {
+        setBookAdminMessage("❌ Failed to add book to catalog");
+      }
+    } finally {
+      setBookSaving(false);
+    }
+  };
+
+  const handleDeleteBook = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this book from the database catalog?")) return;
+    try {
+      const res = await fetch(`/api/books/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete book");
+
+      // Refresh list
+      const r = await fetch("/api/books");
+      const d = await r.json();
+      if (d.books) setBooksAdminList(d.books);
+    } catch (err) {
+      console.error("Failed to delete book:", err);
+      alert("Error deleting book from catalog");
     }
   };
 
@@ -371,6 +544,27 @@ export default function DashboardPage() {
             }}
           >
             <PenTool size={18} /> Manage Posts
+          </button>
+        )}
+
+        {(user.role === "admin" || user.role === "manager") && (
+          <button
+            onClick={() => setActiveTab("books")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.6rem 1rem",
+              borderRadius: "8px",
+              border: "none",
+              background: activeTab === "books" ? "#1e3a8a" : "transparent",
+              color: activeTab === "books" ? "#ffffff" : "#475569",
+              fontWeight: "600",
+              fontSize: "0.95rem",
+              cursor: "pointer",
+            }}
+          >
+            <Library size={18} /> Manage Books &amp; Catalog
           </button>
         )}
 
@@ -644,6 +838,394 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* TAB: MANAGE BOOKS & CATALOG */}
+      {activeTab === "books" && (user.role === "admin" || user.role === "manager") && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem" }}>
+          {/* Book Creation Form */}
+          <div
+            style={{
+              background: "#ffffff",
+              border: "1px solid #e2e8f0",
+              borderRadius: "14px",
+              padding: "2rem",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.4rem" }}>
+              <Library size={24} color="#1e3a8a" />
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                Add New Book to Database Catalog
+              </h2>
+            </div>
+            <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+              Save books directly to the MongoDB database. Published books will instantly appear on the website&apos;s Books page with pricing and cart purchasing.
+            </p>
+
+            {bookAdminMessage && (
+              <div
+                style={{
+                  padding: "0.75rem 1rem",
+                  borderRadius: "8px",
+                  fontSize: "0.9rem",
+                  marginBottom: "1.25rem",
+                  background: bookAdminMessage.startsWith("✅") ? "#f0fdf4" : "#fef2f2",
+                  color: bookAdminMessage.startsWith("✅") ? "#166534" : "#991b1b",
+                  border: `1px solid ${bookAdminMessage.startsWith("✅") ? "#bbf7d0" : "#fecaca"}`,
+                }}
+              >
+                {bookAdminMessage}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateBook} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                    Book Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Guidance for Ministry and Faithful Stewardship"
+                    value={newBookTitle}
+                    onChange={(e) => setNewBookTitle(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "0.7rem 0.9rem",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.95rem",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                    Category
+                  </label>
+                  <select
+                    value={newBookCategory}
+                    onChange={(e) => setNewBookCategory(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "0.7rem 0.9rem",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.95rem",
+                      background: "#ffffff",
+                    }}
+                  >
+                    <option value="Church Administration">Church Administration</option>
+                    <option value="Daily Devotional">Daily Devotional</option>
+                    <option value="Hymnology & Worship">Hymnology & Worship</option>
+                    <option value="Youth & School Ministry">Youth & School Ministry</option>
+                    <option value="Hymn History & Biographies">Hymn History & Biographies</option>
+                    <option value="Ministry & Pastoral Care">Ministry & Pastoral Care</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                    Mock Price (₦ NGN) *
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontWeight: "700", color: "#64748b" }}>
+                      ₦
+                    </span>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      step={100}
+                      placeholder="3500"
+                      value={newBookPrice}
+                      onChange={(e) => setNewBookPrice(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "0.7rem 0.9rem 0.7rem 2rem",
+                        borderRadius: "8px",
+                        border: "1px solid #cbd5e1",
+                        fontSize: "0.95rem",
+                      }}
+                    />
+                  </div>
+                  <small style={{ color: "#94a3b8", fontSize: "0.75rem" }}>Mock price, can be updated later</small>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                    Author
+                  </label>
+                  <input
+                    type="text"
+                    value={newBookAuthor}
+                    onChange={(e) => setNewBookAuthor(e.target.value)}
+                    placeholder="Ven. Victor A. Onosemuode JP"
+                    style={{
+                      width: "100%",
+                      padding: "0.7rem 0.9rem",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.95rem",
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                    Color Tone / Theme
+                  </label>
+                  <select
+                    value={newBookTone}
+                    onChange={(e) => setNewBookTone(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "0.7rem 0.9rem",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.95rem",
+                      background: "#ffffff",
+                    }}
+                  >
+                    <option value="book-green">Green (Church Admin)</option>
+                    <option value="book-ochre">Ochre (Devotional)</option>
+                    <option value="book-rust">Rust (Hymnology)</option>
+                    <option value="book-blue">Blue (Youth & Children)</option>
+                    <option value="book-plum">Plum (Hymn History)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                  Poster Image Cover
+                </label>
+                <select
+                  value={newBookCover}
+                  onChange={(e) => setNewBookCover(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "0.7rem 0.9rem",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                    fontSize: "0.95rem",
+                    background: "#ffffff",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <option value="/annual-vestry-meeting-poster.png">The Handbook for Annual Vestry Meetings</option>
+                  <option value="/my-patmos-poster.png">My Patmos (God Speaks)</option>
+                  <option value="/the-hymnfinder-poster.png">The Hymnfinder</option>
+                  <option value="/youth-children-hymn-book-poster.png">Youth and Children Hymn Book</option>
+                  <option value="/historical-encounter-poster.webp">Historical Encounter of Some Hymn Writers</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Or enter custom image path / URL (e.g. /custom-book.png)"
+                  value={newBookCover}
+                  onChange={(e) => setNewBookCover(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "0.6rem 0.9rem",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                    fontSize: "0.85rem",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                  Description / Note *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Describe the purpose, contents, and audience for this book..."
+                  value={newBookNote}
+                  onChange={(e) => setNewBookNote(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem 0.9rem",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                    fontSize: "0.95rem",
+                    lineHeight: "1.5",
+                  }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button
+                  type="submit"
+                  disabled={bookSaving}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    background: "#1e3a8a",
+                    color: "#ffffff",
+                    padding: "0.75rem 1.5rem",
+                    borderRadius: "8px",
+                    border: "none",
+                    fontWeight: "600",
+                    fontSize: "0.95rem",
+                    cursor: bookSaving ? "not-allowed" : "pointer",
+                    opacity: bookSaving ? 0.7 : 1,
+                  }}
+                >
+                  <PlusCircle size={18} />
+                  {bookSaving ? "Adding Book..." : "Add Book to Database"}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Book Catalog List */}
+          <div
+            style={{
+              background: "#ffffff",
+              border: "1px solid #e2e8f0",
+              borderRadius: "14px",
+              padding: "2rem",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div>
+                <h2 style={{ fontSize: "1.2rem", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                  Active Catalog Books
+                </h2>
+                <p style={{ color: "#64748b", fontSize: "0.85rem", margin: "0.2rem 0 0" }}>
+                  Books currently available in MongoDB database ({booksAdminList.length})
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  fetch("/api/books")
+                    .then((r) => r.json())
+                    .then((d) => { if (d.books) setBooksAdminList(d.books); });
+                }}
+                style={{
+                  background: "#f1f5f9",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "6px",
+                  padding: "0.4rem 0.8rem",
+                  fontSize: "0.8rem",
+                  fontWeight: "600",
+                  color: "#334155",
+                  cursor: "pointer",
+                }}
+              >
+                Refresh List
+              </button>
+            </div>
+
+            {booksAdminList.length === 0 ? (
+              <p style={{ color: "#94a3b8", fontStyle: "italic", textAlign: "center", padding: "2rem" }}>
+                No books found in the database. Use the form above to add your first book!
+              </p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {booksAdminList.map((book) => (
+                  <div
+                    key={book._id}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "70px 1fr auto",
+                      alignItems: "center",
+                      gap: "1.25rem",
+                      padding: "1rem 1.25rem",
+                      borderRadius: "10px",
+                      border: "1px solid #e2e8f0",
+                      background: "#f8fafc",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "relative",
+                        width: "70px",
+                        height: "90px",
+                        background: "radial-gradient(circle, #f8f7f1 0%, #ebe7dc 100%)",
+                        borderRadius: "6px",
+                        overflow: "hidden",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Image
+                        src={book.coverImage || "/annual-vestry-meeting-poster.png"}
+                        alt={book.title}
+                        fill
+                        sizes="80px"
+                        style={{ objectFit: "contain", filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.15))" }}
+                      />
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: "220px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem", flexWrap: "wrap" }}>
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            background: "#e2e8f0",
+                            color: "#334155",
+                            padding: "0.2rem 0.5rem",
+                            borderRadius: "4px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {book.category || "Ministry"}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: "0.85rem",
+                            background: "rgba(166, 75, 50, 0.1)",
+                            color: "var(--rust, #a64b32)",
+                            padding: "0.2rem 0.5rem",
+                            borderRadius: "4px",
+                            fontWeight: "800",
+                          }}
+                        >
+                          ₦{Number(book.price || 0).toLocaleString()}
+                        </span>
+                        <h3 style={{ fontSize: "1rem", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                          {book.title}
+                        </h3>
+                      </div>
+                      <p style={{ fontSize: "0.85rem", color: "#64748b", margin: 0 }}>
+                        {book.note}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => handleDeleteBook(book._id)}
+                      title="Delete book from catalog"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
+                        padding: "0.45rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "1px solid #fecaca",
+                        background: "#fff1f2",
+                        color: "#be123c",
+                        fontSize: "0.82rem",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <Trash2 size={15} /> Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* TAB 2: MANAGE USERS & ROLES */}
       {activeTab === "users" && (user.role === "admin" || user.role === "manager") && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2rem" }}>
@@ -847,106 +1429,259 @@ export default function DashboardPage() {
       {/* TAB 3: USER PURCHASED RESOURCES */}
       {activeTab === "resources" && (
         <div>
-          <div style={{ marginBottom: "1.75rem" }}>
-            <h2 style={{ fontSize: "1.35rem", fontWeight: "700", color: "#0f172a", marginBottom: "0.35rem" }}>
-              My Books & Ministry Resources
-            </h2>
-            <p style={{ color: "#64748b", fontSize: "0.95rem" }}>
-              Access your unlocked literature, study materials, and spiritual resources by Ven. Victor Akpevwen Onosemuode.
-            </p>
+          <div style={{ marginBottom: "1.75rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
+            <div>
+              <h2 style={{ fontSize: "1.35rem", fontWeight: "700", color: "#0f172a", marginBottom: "0.35rem" }}>
+                My Books &amp; Ministry Resources
+              </h2>
+              <p style={{ color: "#64748b", fontSize: "0.95rem", margin: 0 }}>
+                Access published literature, pastoral guides, and spiritual hymnbooks by Ven. Victor Akpevwen Onosemuode.
+              </p>
+            </div>
+            <Link
+              href="/resources"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                color: "var(--rust, #a64b32)",
+                fontSize: "0.9rem",
+                fontWeight: "700",
+                textDecoration: "none",
+              }}
+            >
+              Public Book Library <ExternalLink size={15} />
+            </Link>
           </div>
 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
               gap: "1.5rem",
             }}
           >
-            {defaultBooks.map((book) => (
-              <div
-                key={book.id}
-                style={{
-                  background: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "14px",
-                  padding: "1.75rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
-                }}
-              >
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.75rem" }}>
-                    <span
+            {userBooks.map((book) => {
+              const isPurchased =
+                user.role === "admin" ||
+                user.role === "manager" ||
+                user.purchasedItems?.some(
+                  (item) =>
+                    item.toLowerCase() === book.title.toLowerCase() ||
+                    item.toLowerCase() === book._id?.toLowerCase()
+                );
+              const isAdded = addedBookId === book._id;
+
+              return (
+                <div
+                  key={book._id || book.title}
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "14px",
+                    padding: "1.5rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
+                    gap: "1.25rem",
+                  }}
+                >
+                  <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
+                    {/* Book Poster Thumbnail */}
+                    <div
                       style={{
-                        display: "inline-flex",
+                        position: "relative",
+                        width: "85px",
+                        height: "115px",
+                        background: "radial-gradient(circle, #f8f7f1 0%, #ebe7dc 100%)",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        flexShrink: 0,
+                        border: "1px solid #e2e8f0",
+                        display: "flex",
                         alignItems: "center",
-                        gap: "0.3rem",
-                        fontSize: "0.75rem",
-                        fontWeight: "700",
-                        color: "#047857",
-                        background: "#ecfdf5",
-                        padding: "0.2rem 0.55rem",
-                        borderRadius: "999px",
+                        justifyContent: "center",
                       }}
                     >
-                      <CheckCircle size={14} /> Unlocked in Library
-                    </span>
-                    <span style={{ fontSize: "0.8rem", color: "#64748b" }}>{book.pages}</span>
+                      <Image
+                        src={book.coverImage || "/annual-vestry-meeting-poster.png"}
+                        alt={book.title}
+                        fill
+                        sizes="100px"
+                        style={{ objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.18))" }}
+                      />
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem", marginBottom: "0.4rem", flexWrap: "wrap" }}>
+                        <span
+                          style={{
+                            fontSize: "0.72rem",
+                            fontWeight: "750",
+                            color: "var(--muted, #5c6e66)",
+                            background: "rgba(23, 58, 50, 0.06)",
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          {book.category || "Ministry"}
+                        </span>
+
+                        {isPurchased ? (
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.25rem",
+                              fontSize: "0.72rem",
+                              fontWeight: "750",
+                              color: "#047857",
+                              background: "#ecfdf5",
+                              padding: "2px 8px",
+                              borderRadius: "999px",
+                            }}
+                          >
+                            <CheckCircle size={13} /> Unlocked
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              fontSize: "0.85rem",
+                              fontWeight: "800",
+                              color: "var(--rust, #a64b32)",
+                            }}
+                          >
+                            {formatPrice(book.price || 3500, book.currency)}
+                          </span>
+                        )}
+                      </div>
+
+                      <h3
+                        style={{
+                          fontSize: "1rem",
+                          fontWeight: "700",
+                          color: "#0f172a",
+                          margin: "0 0 0.35rem",
+                          lineHeight: "1.3",
+                        }}
+                      >
+                        {book.title}
+                      </h3>
+                      <p
+                        style={{
+                          fontSize: "0.82rem",
+                          color: "#64748b",
+                          margin: 0,
+                          lineHeight: "1.45",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {book.note}
+                      </p>
+                    </div>
                   </div>
 
-                  <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "#0f172a", marginBottom: "0.5rem" }}>
-                    {book.title}
-                  </h3>
-                  <p style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "1.25rem" }}>
-                    Format: <strong>{book.type}</strong>
-                  </p>
+                  <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "0.85rem", display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                    {isPurchased ? (
+                      <>
+                        <button
+                          onClick={() => alert(`Starting download of reading copy / study materials for "${book.title}"...`)}
+                          style={{
+                            flex: 1,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.4rem",
+                            background: "#1e3a8a",
+                            color: "#ffffff",
+                            padding: "0.65rem",
+                            borderRadius: "8px",
+                            border: "none",
+                            fontWeight: "600",
+                            fontSize: "0.85rem",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <Download size={15} /> Download PDF
+                        </button>
+                        <Link
+                          href="/resources"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: "0.65rem 0.85rem",
+                            borderRadius: "8px",
+                            border: "1px solid #cbd5e1",
+                            background: "#ffffff",
+                            color: "#334155",
+                            fontSize: "0.85rem",
+                            fontWeight: "600",
+                            textDecoration: "none",
+                          }}
+                        >
+                          Details
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleAddToCartInDashboard(book)}
+                          style={{
+                            flex: 1,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.4rem",
+                            background: isAdded ? "#16a34a" : "var(--rust, #a64b32)",
+                            color: "#ffffff",
+                            padding: "0.65rem",
+                            borderRadius: "8px",
+                            border: "none",
+                            fontWeight: "600",
+                            fontSize: "0.85rem",
+                            cursor: "pointer",
+                            transition: "background 0.2s ease",
+                          }}
+                        >
+                          {isAdded ? (
+                            <>
+                              <Check size={15} /> Added to Cart!
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingBag size={15} /> Order / Add to Cart
+                            </>
+                          )}
+                        </button>
+                        <Link
+                          href="/resources"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: "0.65rem 0.85rem",
+                            borderRadius: "8px",
+                            border: "1px solid #cbd5e1",
+                            background: "#ffffff",
+                            color: "#334155",
+                            fontSize: "0.85rem",
+                            fontWeight: "600",
+                            textDecoration: "none",
+                          }}
+                        >
+                          Read More
+                        </Link>
+                      </>
+                    )}
+                  </div>
                 </div>
-
-                <div style={{ display: "flex", gap: "0.75rem" }}>
-                  <button
-                    onClick={() => alert(`Starting download for "${book.title}"...`)}
-                    style={{
-                      flex: 1,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "0.4rem",
-                      background: "#1e3a8a",
-                      color: "#ffffff",
-                      padding: "0.65rem",
-                      borderRadius: "8px",
-                      border: "none",
-                      fontWeight: "600",
-                      fontSize: "0.88rem",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <Download size={16} /> Download
-                  </button>
-
-                  <Link
-                    href="/resources"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "0.65rem 0.85rem",
-                      borderRadius: "8px",
-                      border: "1px solid #cbd5e1",
-                      background: "#ffffff",
-                      color: "#334155",
-                      fontSize: "0.88rem",
-                      textDecoration: "none",
-                    }}
-                  >
-                    Details
-                  </Link>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div
@@ -965,29 +1700,49 @@ export default function DashboardPage() {
           >
             <div>
               <h4 style={{ fontSize: "1rem", fontWeight: "600", color: "#0f172a", margin: "0 0 0.25rem" }}>
-                Looking for more books or mentorship resources?
+                Looking for copies for your church parish, choir, or school?
               </h4>
               <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>
-                Explore the complete collection of Ven. Victor Onosemuode&apos;s published ministry books.
+                Explore the complete five legacy books written by Ven. Victor Akpevwen Onosemuode or make bulk enquiries.
               </p>
             </div>
-            <Link
-              href="/resources"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.4rem",
-                padding: "0.6rem 1.1rem",
-                background: "#0f172a",
-                color: "#ffffff",
-                borderRadius: "8px",
-                fontSize: "0.88rem",
-                fontWeight: "600",
-                textDecoration: "none",
-              }}
-            >
-              Browse All Books <ExternalLink size={15} />
-            </Link>
+            <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+              <Link
+                href="/resources"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  padding: "0.6rem 1.1rem",
+                  background: "#0f172a",
+                  color: "#ffffff",
+                  borderRadius: "8px",
+                  fontSize: "0.88rem",
+                  fontWeight: "600",
+                  textDecoration: "none",
+                }}
+              >
+                Explore All 5 Books <ExternalLink size={15} />
+              </Link>
+              <Link
+                href="/contact"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  padding: "0.6rem 1.1rem",
+                  background: "#ffffff",
+                  color: "#334155",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  fontSize: "0.88rem",
+                  fontWeight: "600",
+                  textDecoration: "none",
+                }}
+              >
+                Parish Enquiries
+              </Link>
+            </div>
           </div>
         </div>
       )}

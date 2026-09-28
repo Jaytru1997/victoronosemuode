@@ -1,5 +1,4 @@
 const storefront = "https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/themes/938575/settings_images";
-const bookshelf = "https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/themes/1004502/settings_images";
 
 export const referenceImages = {
   logo: "/logo.png",
@@ -28,10 +27,10 @@ export const referenceImages = {
     `${storefront}/5gKw5hZRrqG7t4dGvprX_SC_endorsement4.png`,
   ],
   books: [
-    `${bookshelf}/S4Pv9cVRQgWVBqZHhu5C_SC-book_STS_3D2.png`,
-    `${bookshelf}/Wi2tyovNQAysKM3fDHOV_SC-book_HTPOT_3D2.png`,
-    `${bookshelf}/tbdW7KjRT2KZj2bklHL1_SC-Book6.png`,
-    `${bookshelf}/kkiHuQ8VQAekEhi7gjzd_SC-Book8.png`,
-    `${bookshelf}/FRFNQ8jSSxibayjq5uo8_SC-Book2.png`,
+    `/annual-vestry-meeting-poster.png`,
+    `/my-patmos-poster.png`,
+    `/the-hymnfinder-poster.png`,
+    `/youth-children-hymn-book-poster.png`,
+    `/historical-encounter-poster.webp`
   ],
 } as const;
