@@ -1,12 +1,12 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { useToast } from "@/src/context/ToastContext";
+import { useCurrency } from "@/src/context/CurrencyContext";
 
 export interface CartItem {
   id: string;
   title: string;
-  price: number;
+  price: number; // Base price in NGN
   currency?: string;
   coverImage: string;
   quantity: number;
@@ -22,7 +22,7 @@ interface CartContextType {
   openCart: () => void;
   closeCart: () => void;
   totalItems: number;
-  totalAmount: number;
+  totalAmount: number; // In NGN
   formatPrice: (amount: number, currency?: string) => string;
 }
 
@@ -30,18 +30,11 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = "victoronosemuode_cart_v1";
 
-export function formatCurrency(amount: number, currency = "NGN"): string {
-  if (currency === "NGN") {
-    return `₦${amount.toLocaleString()}`;
-  }
-  return `$${amount.toFixed(2)}`;
-}
-
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
-  const { success, info } = useToast();
+  const { formatPrice: formatCurrencyPrice } = useCurrency();
 
   // Load cart from localStorage after the initial render to keep hydration stable.
   useEffect(() => {
@@ -74,8 +67,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, isHydrated]);
 
   const addToCart = (newItem: Omit<CartItem, "quantity">, qty = 1) => {
-    const existingItem = items.find((item) => item.id === newItem.id);
-
     setItems((prev) => {
       const existing = prev.find((item) => item.id === newItem.id);
       if (existing) {
@@ -87,23 +78,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...newItem, quantity: qty }];
     });
+    // Open drawer smoothly - no redundant toast popup
     setIsCartOpen(true);
-    success(
-      existingItem
-        ? `${newItem.title} quantity increased to ${existingItem.quantity + qty}.`
-        : `${newItem.title} was added to your cart.`,
-      { title: existingItem ? "Cart updated" : "Added to cart" }
-    );
   };
 
   const removeFromCart = (id: string) => {
-    const removedItem = items.find((item) => item.id === id);
     setItems((prev) => prev.filter((item) => item.id !== id));
-    if (removedItem) {
-      info(`${removedItem.title} was removed from your cart.`, {
-        title: "Removed from cart",
-      });
-    }
   };
 
   const updateQuantity = (id: string, qty: number) => {
@@ -139,7 +119,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         closeCart: () => setIsCartOpen(false),
         totalItems,
         totalAmount,
-        formatPrice: formatCurrency,
+        formatPrice: (amt) => formatCurrencyPrice(amt),
       }}
     >
       {children}

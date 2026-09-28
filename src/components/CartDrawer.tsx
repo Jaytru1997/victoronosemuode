@@ -1,10 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import Link from "next/link";
+import {
+  X,
+  Trash2,
+  Plus,
+  Minus,
+  ShoppingBag,
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  Copy,
+  Check,
+  Building,
+  CreditCard,
+  ShieldCheck,
+} from "lucide-react";
 import { useCart } from "@/src/context/CartContext";
+import { useAuth } from "@/src/context/AuthContext";
+import { useCurrency } from "@/src/context/CurrencyContext";
 import { useToast } from "@/src/context/ToastContext";
+
+type CheckoutStep = "cart" | "address" | "payment" | "success";
 
 export default function CartDrawer() {
   const {
@@ -16,26 +36,69 @@ export default function CartDrawer() {
     clearCart,
     totalItems,
     totalAmount,
-    formatPrice,
   } = useCart();
+  const { user } = useAuth();
+  const { formatPrice, currency } = useCurrency();
   const { success, error } = useToast();
 
-  const [checkoutStep, setCheckoutStep] = useState<"cart" | "form" | "success">("cart");
+  const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("cart");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [orderInfo, setOrderInfo] = useState<{ orderNumber: string } | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  // Form states
+  // Auto-generate reference for this checkout session
+  const [pendingRef, setPendingRef] = useState<string>("");
+
+  useEffect(() => {
+    if (isCartOpen && !pendingRef) {
+      setPendingRef(`VO-${Math.floor(100000 + Math.random() * 900000)}`);
+    }
+  }, [isCartOpen, pendingRef]);
+
+  // Form states - Customer
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
+
+  // Subdivided 5-part Delivery Address
+  const [country, setCountry] = useState("Nigeria");
+  const [stateAddress, setStateAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [street, setStreet] = useState("");
+
+  // Payment Sender Details
+  const [senderDetails, setSenderDetails] = useState("");
+
+  // Auto-fill user email if logged in
+  useEffect(() => {
+    if (user?.email && !email) {
+      setEmail(user.email);
+    }
+  }, [user, email]);
 
   if (!isCartOpen) return null;
 
-  const handleCheckoutSubmit = async (e: React.FormEvent) => {
+  const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
+
+    if (!name.trim() || !email.trim()) {
+      setErrorMessage("Please enter your name and email address.");
+      return;
+    }
+
+    if (!street.trim() || !city.trim() || !stateAddress.trim()) {
+      setErrorMessage("Please complete your delivery address (Country, State, City, and Street Address).");
+      return;
+    }
+
+    setCheckoutStep("payment");
+  };
+
+  const handleConfirmPaymentSent = async () => {
     setSubmitting(true);
     setErrorMessage(null);
 
@@ -44,44 +107,60 @@ export default function CartDrawer() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          orderNumber: pendingRef,
           items,
           customerName: name,
           customerEmail: email,
           customerPhone: phone,
-          deliveryAddress: address,
+          deliveryAddress: {
+            country: country.trim(),
+            state: stateAddress.trim(),
+            city: city.trim(),
+            postalCode: postalCode.trim(),
+            street: street.trim(),
+          },
           notes,
+          currency,
+          senderDetails: senderDetails.trim(),
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to process order.");
+        throw new Error(data.error || "Failed to process payment confirmation.");
       }
 
-      setOrderInfo({ orderNumber: data.orderNumber });
+      setOrderInfo({ orderNumber: data.orderNumber || pendingRef });
       setCheckoutStep("success");
       clearCart();
-      success("Your order request has been received. We will contact you to confirm payment and delivery.", {
-        title: data.orderNumber ? `Order ${data.orderNumber} received` : "Order received",
-        duration: 6000,
-      });
+      success(
+        "Your payment has been logged and sent to the admin pending list for verification.",
+        {
+          title: `Payment Sent (Ref: ${data.orderNumber || pendingRef})`,
+          duration: 6000,
+        }
+      );
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setErrorMessage(err.message);
-        error(err.message, { title: "Order could not be placed" });
-      } else {
-        const message = "An unexpected error occurred during checkout.";
-        setErrorMessage(message);
-        error(message, { title: "Order could not be placed" });
-      }
+      const msg = err instanceof Error ? err.message : "An error occurred while confirming payment.";
+      setErrorMessage(msg);
+      error(msg, { title: "Could not submit payment" });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const copyToClipboard = (text: string, field: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2500);
     }
   };
 
   const handleClose = () => {
     if (checkoutStep === "success") {
       setCheckoutStep("cart");
+      setPendingRef("");
     }
     closeCart();
   };
@@ -104,7 +183,7 @@ export default function CartDrawer() {
         style={{
           position: "fixed",
           inset: 0,
-          background: "rgba(15, 37, 31, 0.6)",
+          background: "rgba(15, 37, 31, 0.65)",
           backdropFilter: "blur(4px)",
           transition: "opacity 0.3s ease",
         }}
@@ -116,10 +195,10 @@ export default function CartDrawer() {
           position: "relative",
           zIndex: 10,
           width: "100%",
-          maxWidth: "480px",
+          maxWidth: "500px",
           height: "100%",
           background: "var(--paper, #f8f7f1)",
-          boxShadow: "-8px 0 35px rgba(0, 0, 0, 0.25)",
+          boxShadow: "-8px 0 35px rgba(0, 0, 0, 0.28)",
           display: "flex",
           flexDirection: "column",
           overflowY: "auto",
@@ -138,8 +217,21 @@ export default function CartDrawer() {
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
             <ShoppingBag size={20} color="var(--rust, #a64b32)" />
-            <h2 style={{ margin: 0, fontSize: "1.2rem", fontFamily: "Georgia, serif", color: "var(--ink, #173a32)" }}>
-              {checkoutStep === "success" ? "Order Confirmed" : checkoutStep === "form" ? "Book Order Details" : "Your Book Cart"}
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "1.2rem",
+                fontFamily: "Georgia, serif",
+                color: "var(--ink, #173a32)",
+              }}
+            >
+              {checkoutStep === "success"
+                ? "Payment Submitted"
+                : checkoutStep === "payment"
+                  ? "Bank Transfer Payment"
+                  : checkoutStep === "address"
+                    ? "Delivery & Order Details"
+                    : "Your Book Cart"}
             </h2>
             {checkoutStep === "cart" && (
               <span
@@ -176,16 +268,17 @@ export default function CartDrawer() {
 
         {/* Content */}
         <div style={{ flex: 1, padding: "1.5rem", overflowY: "auto" }}>
+          {/* STEP 1: CART ITEMS */}
           {checkoutStep === "cart" && (
             <>
               {items.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "4rem 1rem", color: "var(--muted, #5c6e66)" }}>
-                  <ShoppingBag size={52} strokeWidth={1.2} style={{ margin: "0 auto 1rem", opacity: 0.4 }} />
+                  <ShoppingBag size={52} strokeWidth={1.2} style={{ margin: "0 auto 1rem", opacity: 0.35 }} />
                   <p style={{ fontSize: "1.1rem", fontWeight: "600", marginBottom: "0.5rem", color: "var(--ink, #173a32)" }}>
                     Your cart is currently empty
                   </p>
                   <p style={{ fontSize: "0.9rem", maxWidth: "280px", margin: "0 auto 1.5rem" }}>
-                    Select books from our library to add them to your order.
+                    Select books from Ven. Victor Onosemuode (Rtd.)&apos;s publications to order.
                   </p>
                   <button
                     onClick={handleClose}
@@ -246,7 +339,7 @@ export default function CartDrawer() {
                           {item.title}
                         </h4>
                         <div style={{ color: "var(--rust, #a64b32)", fontWeight: "750", fontSize: "0.95rem", marginBottom: "0.5rem" }}>
-                          {formatPrice(item.price, item.currency)}
+                          {formatPrice(item.price)}
                         </div>
                         {/* Quantity Controls */}
                         <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", background: "var(--paper, #f8f7f1)", borderRadius: "6px", padding: "2px 6px", border: "1px solid var(--line, #d8ddd6)" }}>
@@ -292,10 +385,20 @@ export default function CartDrawer() {
             </>
           )}
 
-          {checkoutStep === "form" && (
-            <form onSubmit={handleCheckoutSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ background: "#ffffff", padding: "1rem", borderRadius: "8px", border: "1px solid var(--line, #d8ddd6)", fontSize: "0.88rem", color: "var(--muted, #5c6e66)" }}>
-                Purchasing <strong>{totalItems} {totalItems === 1 ? "book" : "books"}</strong> for total{" "}
+          {/* STEP 2: CUSTOMER DETAILS & 5-PART SUBDIVIDED ADDRESS */}
+          {checkoutStep === "address" && (
+            <form onSubmit={handleProceedToPayment} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div
+                style={{
+                  background: "#ffffff",
+                  padding: "0.85rem 1rem",
+                  borderRadius: "8px",
+                  border: "1px solid var(--line, #d8ddd6)",
+                  fontSize: "0.88rem",
+                  color: "var(--muted, #5c6e66)",
+                }}
+              >
+                Ordering <strong>{totalItems} {totalItems === 1 ? "book" : "books"}</strong> for total{" "}
                 <strong style={{ color: "var(--rust, #a64b32)" }}>{formatPrice(totalAmount)}</strong>.
               </div>
 
@@ -306,7 +409,7 @@ export default function CartDrawer() {
               )}
 
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
                   Full Name *
                 </label>
                 <input
@@ -315,64 +418,139 @@ export default function CartDrawer() {
                   placeholder="e.g. Bro. David Osagie"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem 0.85rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                  style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
                 />
               </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem 0.85rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                    Phone (WhatsApp) *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="+234 800 000 0000"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
+                  />
+                </div>
+              </div>
+
+              {/* Subdivided Delivery Address Header */}
+              <div style={{ borderTop: "1px solid var(--line, #d8ddd6)", paddingTop: "0.85rem", marginTop: "0.25rem" }}>
+                <h4 style={{ margin: "0 0 0.6rem", fontSize: "0.92rem", fontWeight: "750", color: "var(--ink, #173a32)" }}>
+                  Delivery Address Details (5 Subdivisions)
+                </h4>
+
+                {/* (i) Country */}
+                <div style={{ marginBottom: "0.65rem" }}>
+                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "700", color: "#475569", marginBottom: "0.25rem" }}>
+                    Country *
+                  </label>
+                  <select
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem", background: "#ffffff" }}
+                  >
+                    <option value="Nigeria">Nigeria</option>
+                    <option value="United States">United States</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Ghana">Ghana</option>
+                    <option value="South Africa">South Africa</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                {/* (ii) State & (iii) City */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "0.65rem" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "700", color: "#475569", marginBottom: "0.25rem" }}>
+                      State / Province *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Delta State"
+                      value={stateAddress}
+                      onChange={(e) => setStateAddress(e.target.value)}
+                      style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "700", color: "#475569", marginBottom: "0.25rem" }}>
+                      City / Town *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Ughelli / Warri"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
+                    />
+                  </div>
+                </div>
+
+                {/* (iv) Postal / ZIP Code */}
+                <div style={{ marginBottom: "0.65rem" }}>
+                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "700", color: "#475569", marginBottom: "0.25rem" }}>
+                    Postal / ZIP Code
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 330101 (Optional for Nigeria)"
+                    value={postalCode}
+                    onChange={(e) => setPostalCode(e.target.value)}
+                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
+                  />
+                </div>
+
+                {/* (v) Street Address */}
+                <div style={{ marginBottom: "0.65rem" }}>
+                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "700", color: "#475569", marginBottom: "0.25rem" }}>
+                    Street Address &amp; House Number *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 14 Mission Road, Beside St. Barnabas Church"
+                    value={street}
+                    onChange={(e) => setStreet(e.target.value)}
+                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
+                  />
+                </div>
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Phone Number (WhatsApp preferred)
-                </label>
-                <input
-                  type="tel"
-                  placeholder="+234 800 000 0000"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem 0.85rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Delivery Address / Church Parish
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="State, City, Parish or mailing address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem 0.85rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                  Special Note or Inscription Request
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                  Special Note or Dedication Inscription (Optional)
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Please sign with dedication to St. Paul's Youth"
+                  placeholder="e.g. Please dedicate to St. Peter's Anglican Youth"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem 0.85rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                  style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
                 />
               </div>
 
-              <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+              <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.75rem" }}>
                 <button
                   type="button"
                   onClick={() => setCheckoutStep("cart")}
@@ -384,36 +562,238 @@ export default function CartDrawer() {
                     color: "var(--muted, #5c6e66)",
                     fontWeight: "600",
                     cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
                   }}
                 >
-                  Back to Cart
+                  <ArrowLeft size={16} /> Back
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
                   className="button button-rust"
                   style={{ flex: 1, minHeight: "46px", justifyContent: "center" }}
                 >
-                  {submitting ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" /> Placing Order...
-                    </>
-                  ) : (
-                    <>
-                      Place Order · {formatPrice(totalAmount)}
-                    </>
-                  )}
+                  Continue to Payment <ArrowRight size={16} />
                 </button>
               </div>
             </form>
           )}
 
+          {/* STEP 3: BANK TRANSFER PAYMENT DISPLAY */}
+          {checkoutStep === "payment" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+              <div
+                style={{
+                  background: "#ffffff",
+                  padding: "1.2rem",
+                  borderRadius: "10px",
+                  border: "1px solid var(--line, #d8ddd6)",
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.75rem" }}>
+                  <span style={{ fontSize: "0.9rem", color: "var(--muted, #5c6e66)" }}>Total Amount to Pay:</span>
+                  <span style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--rust, #a64b32)" }}>
+                    {formatPrice(totalAmount)}
+                  </span>
+                </div>
+                <div style={{ fontSize: "0.82rem", color: "#64748b" }}>
+                  For <strong>{totalItems} books</strong> · Recipient: {name} ({email})
+                </div>
+              </div>
+
+              {errorMessage && (
+                <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b", padding: "0.75rem", borderRadius: "6px", fontSize: "0.88rem" }}>
+                  {errorMessage}
+                </div>
+              )}
+
+              {/* Official Bank Account Box */}
+              <div
+                style={{
+                  background: "#f0fdf4",
+                  border: "1.5px solid #86efac",
+                  borderRadius: "10px",
+                  padding: "1.25rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem", color: "#166534" }}>
+                  <Building size={20} />
+                  <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: "750" }}>
+                    Official Ministry Transfer Details
+                  </h3>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                  <div style={{ background: "#ffffff", padding: "0.75rem 0.9rem", borderRadius: "8px", border: "1px solid #bbf7d0" }}>
+                    <div style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#64748b", fontWeight: "700" }}>
+                      Bank Name
+                    </div>
+                    <div style={{ fontSize: "1rem", fontWeight: "700", color: "#0f172a" }}>
+                      Zenith Bank PLC
+                    </div>
+                  </div>
+
+                  <div style={{ background: "#ffffff", padding: "0.75rem 0.9rem", borderRadius: "8px", border: "1px solid #bbf7d0" }}>
+                    <div style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#64748b", fontWeight: "700" }}>
+                      Account Name
+                    </div>
+                    <div style={{ fontSize: "0.98rem", fontWeight: "700", color: "#0f172a" }}>
+                      Ven. Dr. Victor A. Onosemuode (Rtd.)
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      background: "#ffffff",
+                      padding: "0.75rem 0.9rem",
+                      borderRadius: "8px",
+                      border: "1px solid #bbf7d0",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#64748b", fontWeight: "700" }}>
+                        Account Number
+                      </div>
+                      <div style={{ fontSize: "1.25rem", fontWeight: "850", color: "#166534", letterSpacing: "0.05em", fontFamily: "monospace" }}>
+                        1014892014
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard("1014892014", "acc")}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                        padding: "0.45rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "1px solid #cbd5e1",
+                        background: copiedField === "acc" ? "#166534" : "#f8fafc",
+                        color: copiedField === "acc" ? "#ffffff" : "#334155",
+                        fontSize: "0.78rem",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {copiedField === "acc" ? <Check size={14} /> : <Copy size={14} />}
+                      {copiedField === "acc" ? "Copied" : "Copy"}
+                    </button>
+                  </div>
+
+                  <div
+                    style={{
+                      background: "#ffffff",
+                      padding: "0.75rem 0.9rem",
+                      borderRadius: "8px",
+                      border: "1px solid #bbf7d0",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#64748b", fontWeight: "700" }}>
+                        Order Narration / Reference
+                      </div>
+                      <div style={{ fontSize: "1.1rem", fontWeight: "800", color: "var(--rust, #a64b32)", letterSpacing: "0.04em", fontFamily: "monospace" }}>
+                        {pendingRef}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(pendingRef, "ref")}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                        padding: "0.45rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "1px solid #cbd5e1",
+                        background: copiedField === "ref" ? "#166534" : "#f8fafc",
+                        color: copiedField === "ref" ? "#ffffff" : "#334155",
+                        fontSize: "0.78rem",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {copiedField === "ref" ? <Check size={14} /> : <Copy size={14} />}
+                      {copiedField === "ref" ? "Copied" : "Copy"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sender Details Input */}
+              <div style={{ background: "#ffffff", padding: "1rem", borderRadius: "8px", border: "1px solid var(--line, #d8ddd6)" }}>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
+                  Sender Bank / Account Name (Optional but recommended)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Transferred from GTBank - David Osagie"
+                  value={senderDetails}
+                  onChange={(e) => setSenderDetails(e.target.value)}
+                  style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.92rem" }}
+                />
+                <small style={{ color: "#64748b", fontSize: "0.75rem", display: "block", marginTop: "0.35rem" }}>
+                  Helps our accountant quickly verify and approve your transfer.
+                </small>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setCheckoutStep("address")}
+                  disabled={submitting}
+                  style={{
+                    padding: "0.75rem 1rem",
+                    borderRadius: "6px",
+                    border: "1px solid var(--line, #d8ddd6)",
+                    background: "#ffffff",
+                    color: "var(--muted, #5c6e66)",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                  }}
+                >
+                  <ArrowLeft size={16} /> Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmPaymentSent}
+                  disabled={submitting}
+                  className="button button-rust"
+                  style={{ flex: 1, minHeight: "48px", justifyContent: "center", fontWeight: "750" }}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 size={17} className="animate-spin" /> Submitting Payment...
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck size={18} /> I Have Sent the Payment
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: SUCCESS VIEW */}
           {checkoutStep === "success" && (
             <div style={{ textAlign: "center", padding: "2.5rem 1rem" }}>
               <div
                 style={{
-                  width: "60px",
-                  height: "60px",
+                  width: "64px",
+                  height: "64px",
                   borderRadius: "50%",
                   background: "#dcfce7",
                   display: "grid",
@@ -422,26 +802,45 @@ export default function CartDrawer() {
                   color: "#16a34a",
                 }}
               >
-                <CheckCircle2 size={34} />
+                <CheckCircle2 size={36} />
               </div>
               <h3 style={{ fontFamily: "Georgia, serif", fontSize: "1.45rem", margin: "0 0 0.5rem", color: "var(--ink, #173a32)" }}>
-                Order Received!
+                Payment Submitted!
               </h3>
               {orderInfo?.orderNumber && (
-                <div style={{ display: "inline-block", background: "#f1f5f9", padding: "4px 12px", borderRadius: "4px", fontWeight: "750", fontSize: "0.9rem", color: "#334155", margin: "0.5rem 0 1rem" }}>
+                <div style={{ display: "inline-block", background: "#f1f5f9", padding: "6px 14px", borderRadius: "6px", fontWeight: "800", fontSize: "0.95rem", color: "var(--rust, #a64b32)", margin: "0.5rem 0 1rem", letterSpacing: "0.05em" }}>
                   Ref: {orderInfo.orderNumber}
                 </div>
               )}
-              <p style={{ color: "var(--muted, #5c6e66)", fontSize: "0.95rem", lineHeight: "1.6", maxWidth: "340px", margin: "0 auto 1.5rem" }}>
-                Thank you for your order! Your request has been logged in our system. The ministry office will contact you for payment verification and delivery.
+              <p style={{ color: "var(--muted, #5c6e66)", fontSize: "0.92rem", lineHeight: "1.6", maxWidth: "360px", margin: "0 auto 1.5rem" }}>
+                Thank you! Your payment notice has been added to our pending list. Our administration will confirm the transfer and unlock your books in your Member Dashboard under <strong>Purchased Books &amp; Resources</strong>.
               </p>
-              <button
-                onClick={handleClose}
-                className="button button-rust"
-                style={{ padding: "0 1.5rem", minHeight: "44px" }}
-              >
-                Continue Browsing
-              </button>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", maxWidth: "280px", margin: "0 auto" }}>
+                <Link
+                  href="/dashboard"
+                  onClick={handleClose}
+                  className="button button-rust"
+                  style={{ width: "100%", justifyContent: "center", minHeight: "44px" }}
+                >
+                  View in Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  style={{
+                    padding: "0.6rem 1rem",
+                    borderRadius: "6px",
+                    border: "1px solid var(--line, #d8ddd6)",
+                    background: "transparent",
+                    color: "var(--muted, #5c6e66)",
+                    fontSize: "0.85rem",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                  }}
+                >
+                  Continue Browsing
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -465,11 +864,11 @@ export default function CartDrawer() {
               </span>
             </div>
             <button
-              onClick={() => setCheckoutStep("form")}
+              onClick={() => setCheckoutStep("address")}
               className="button button-rust"
               style={{ width: "100%", justifyContent: "center", minHeight: "48px", fontSize: "0.9rem" }}
             >
-              Proceed to Purchase <ArrowRight size={16} />
+              Proceed to Delivery Details <ArrowRight size={16} />
             </button>
             <div style={{ textAlign: "center", fontSize: "0.75rem", color: "#94a3b8" }}>
               Direct order fulfilment · Delivery coordinated across Nigeria &amp; International

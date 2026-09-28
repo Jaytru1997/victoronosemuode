@@ -1,0 +1,116 @@
+{
+  "projectName": "victoronosemuode",
+  "repository": "https://github.com/Jaytru1997/victoronosemuode",
+  "description": "A modern full‑stack web application for managing a catalog of books, supporting role‑based user accounts (admin, manager, regular user), a shopping cart, order processing, and global toast notifications. The UI is built with Next.js (React) and Tailwind‑free vanilla CSS, while persistence is handled via MongoDB/Mongoose.",
+  "technologies": {
+    "frontend": [
+      "Next.js (React) – TypeScript",
+      "Vanilla CSS (custom design system)",
+      "React Context API (Toast, Cart, Auth)",
+      "HTML5 semantic markup"
+    ],
+    "backend": [
+      "Node.js (v18+)",
+      "Next.js API routes",
+      "MongoDB (Mongoose)",
+      "bcrypt for password hashing",
+      "JWT / next‑auth style session handling"
+    ],
+    "devOps": [
+      "npm scripts (dev, build)",
+      "ESLint + Prettier",
+      "Git"
+    ]
+  },
+  "architecture": {
+    "client": {
+      "layout": "app/layout.tsx – wraps the whole app with ToastProvider, CartProvider, AuthProvider",
+      "navigation": "src/components/Navbar.tsx, src/components/Footer.tsx",
+      "notifications": "src/context/ToastContext.tsx + src/components/ToastContainer.tsx",
+      "cartUI": "src/components/CartDrawer.tsx (slides in from the side)",
+      "pages": {
+        "login": "app/login/page.tsx",
+        "dashboard": "app/dashboard/page.tsx",
+        "books": "app/books/page.tsx",
+        "bookDetail": "app/books/[id]/page.tsx",
+        "admin": {
+          "manageBooks": "app/admin/books/page.tsx",
+          "manageUsers": "app/admin/users/page.tsx"
+        }
+      }
+    },
+    "server": {
+      "api": {
+        "auth": "app/api/auth/*.ts (login, logout, session)",
+        "books": "app/api/books/*.ts (GET list, POST create, PUT update, DELETE)",
+        "orders": "app/api/orders/*.ts (POST create order, GET user orders)",
+        "cart": "app/api/cart/*.ts (GET current cart, POST add/remove items)"
+      },
+      "models": {
+        "User": "src/models/user.ts",
+        "Book": "src/models/book.ts",
+        "Order": "src/models/order.ts",
+        "Cart": "src/models/cart.ts (embedded in user document or separate collection)"
+      }
+    },
+    "stateManagement": {
+      "AuthContext": "src/context/AuthContext.tsx – stores current user & role",
+      "CartContext": "src/context/CartContext.tsx – stores cart items, persists to localStorage",
+      "ToastContext": "src/context/ToastContext.tsx – global toast queue"
+    }
+  },
+  "keyDirectories": {
+    "app": [
+      "layout.tsx",
+      "dashboard/",
+      "books/",
+      "admin/",
+      "login/",
+      "api/"
+    ],
+    "src": [
+      "components/",
+      "context/",
+      "models/",
+      "utils/"
+    ],
+    "public": [
+      "images/",
+      "favicon.ico"
+    ]
+  },
+  "importantFiles": {
+    "layout": "app/layout.tsx",
+    "navbar": "src/components/Navbar.tsx",
+    "footer": "src/components/Footer.tsx",
+    "toastContext": "src/context/ToastContext.tsx",
+    "toastContainer": "src/components/ToastContainer.tsx",
+    "cartContext": "src/context/CartContext.tsx",
+    "authContext": "src/context/AuthContext.tsx",
+    "bookModel": "src/models/book.ts",
+    "userModel": "src/models/user.ts",
+    "orderModel": "src/models/order.ts",
+    "bookAPI": "app/api/books/route.ts",
+    "orderAPI": "app/api/orders/route.ts",
+    "authAPI": "app/api/auth/route.ts"
+  },
+  "features": [
+    "User authentication with role‑based access (admin, manager, regular user)",
+    "CRUD operations for books (admin/manager can create, edit, delete)",
+    "Mock prices displayed for each book (editable later)",
+    "Dynamic fetching of book data from MongoDB",
+    "Shopping cart that persists across page reloads via localStorage",
+    "Order creation and history view",
+    "Global toast notifications for success / error messages across all pages",
+    "Responsive layout – book posters and details stack vertically on mobile",
+    "Dashboard showing real data (no mock placeholders)",
+    "Clean UI with custom CSS, glass‑morphism, subtle animations"
+  ],
+  "status": {
+    "toastFeature": "Implemented ToastProvider, ToastContainer, and integrated in root layout. Ready to be triggered via useToast hook from any component.",
+    "bookManagement": "Fully functional CRUD API and UI; mock prices are present and can be edited later.",
+    "cartSystem": "Cart drawer UI and context wired; cart actions emit toast notifications.",
+    "dashboard": "Displays live data from DB; mock book data removed.",
+    "documentation": "Current JSON summary generated as requested."
+  }
+}

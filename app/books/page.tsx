@@ -30,7 +30,7 @@ const fallbackBooks: BookItem[] = [
     price: 3500,
     currency: "NGN",
     category: "Church Administration",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
   },
   {
     _id: "seed-2",
@@ -41,7 +41,7 @@ const fallbackBooks: BookItem[] = [
     price: 4000,
     currency: "NGN",
     category: "Daily Devotional",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
   },
   {
     _id: "seed-3",
@@ -52,7 +52,7 @@ const fallbackBooks: BookItem[] = [
     price: 5000,
     currency: "NGN",
     category: "Hymnology & Worship",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
   },
   {
     _id: "seed-4",
@@ -63,7 +63,7 @@ const fallbackBooks: BookItem[] = [
     price: 3000,
     currency: "NGN",
     category: "Youth & School Ministry",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
   },
   {
     _id: "seed-5",
@@ -74,7 +74,7 @@ const fallbackBooks: BookItem[] = [
     price: 4500,
     currency: "NGN",
     category: "Hymn History & Biographies",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
   },
 ];
 
@@ -190,10 +190,7 @@ export default function Resources() {
                     }}
                   >
                     <span style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--rust, #a64b32)" }}>
-                      {formatPrice(book.price || 3500, book.currency)}
-                    </span>
-                    <span style={{ fontSize: "0.8rem", color: "var(--muted, #5c6e66)" }}>
-                      · Mock Price
+                      {formatPrice(book.price || 3500)}
                     </span>
                   </div>
 

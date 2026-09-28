@@ -102,7 +102,7 @@ export default function SignupPage() {
             <Link href="/" title="Back to home" style={{ display: "inline-block" }}>
               <Image
                 src="/logo.png"
-                alt="Ven. Victor Akpevwen Onosemuode Logo"
+                alt="Ven. Victor Akpevwen Onosemuode (Rtd.) Logo"
                 width={190}
                 height={65}
                 style={{ objectFit: "contain", maxHeight: "60px", width: "auto" }}
@@ -324,7 +324,7 @@ export default function SignupPage() {
 
         <div style={{ textAlign: "center", marginTop: "1rem" }}>
           <Link href="/" style={{ fontSize: "0.85rem", color: "#64748b", textDecoration: "underline" }}>
-            Return to Victor Onosemuode Home
+            Return to Victor Onosemuode (Rtd.) Home
           </Link>
         </div>
       </div>

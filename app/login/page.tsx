@@ -1,19 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Lock, Mail, ArrowRight, ShieldCheck, UserCheck, BookOpen } from "lucide-react";
 import { useToast } from "@/src/context/ToastContext";
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
   const { success, error: showToastError } = useToast();
+  const { user, loading: authLoading, setAuthenticatedUser, refreshUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // If already logged in, redirect straight to dashboard
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/dashboard");
+    }
+  }, [authLoading, user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,9 +43,14 @@ export default function LoginPage() {
       }
 
       // Successfully logged in
-      success("Signed in successfully. Redirecting to your dashboard.", { title: "Welcome back" });
-      router.push("/dashboard");
-      router.refresh();
+      if (data.user) {
+        setAuthenticatedUser(data.user);
+        await refreshUser();
+      }
+      success("Signed in successfully. Redirecting to your dashboard...", { title: "Welcome back" });
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 200);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -80,7 +94,7 @@ export default function LoginPage() {
             <Link href="/" title="Back to home" style={{ display: "inline-block" }}>
               <Image
                 src="/logo.png"
-                alt="Ven. Victor Akpevwen Onosemuode Logo"
+                alt="Ven. Victor Akpevwen Onosemuode (Rtd.) Logo"
                 width={190}
                 height={65}
                 style={{ objectFit: "contain", maxHeight: "60px", width: "auto" }}
@@ -225,7 +239,7 @@ export default function LoginPage() {
 
         <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
           <Link href="/" style={{ fontSize: "0.85rem", color: "#64748b", textDecoration: "underline" }}>
-            Return to Victor Onosemuode Home
+            Return to Victor Onosemuode (Rtd.) Home
           </Link>
         </div>
       </div>

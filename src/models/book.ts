@@ -27,7 +27,7 @@ export const defaultBooksSeed: Omit<Book, "_id" | "createdAt" | "updatedAt">[] =
     coverImage: "/annual-vestry-meeting-poster.png",
     tone: "book-green",
     category: "Church Administration",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
     inStock: true,
   },
   {
@@ -39,7 +39,7 @@ export const defaultBooksSeed: Omit<Book, "_id" | "createdAt" | "updatedAt">[] =
     coverImage: "/my-patmos-poster.png",
     tone: "book-ochre",
     category: "Daily Devotional",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
     inStock: true,
   },
   {
@@ -51,7 +51,7 @@ export const defaultBooksSeed: Omit<Book, "_id" | "createdAt" | "updatedAt">[] =
     coverImage: "/the-hymnfinder-poster.png",
     tone: "book-rust",
     category: "Hymnology & Worship",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
     inStock: true,
   },
   {
@@ -63,7 +63,7 @@ export const defaultBooksSeed: Omit<Book, "_id" | "createdAt" | "updatedAt">[] =
     coverImage: "/youth-children-hymn-book-poster.png",
     tone: "book-blue",
     category: "Youth & School Ministry",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
     inStock: true,
   },
   {
@@ -75,7 +75,7 @@ export const defaultBooksSeed: Omit<Book, "_id" | "createdAt" | "updatedAt">[] =
     coverImage: "/historical-encounter-poster.webp",
     tone: "book-plum",
     category: "Hymn History & Biographies",
-    author: "Ven. Victor A. Onosemuode JP",
+    author: "Ven. Victor A. Onosemuode JP (Rtd.)",
     inStock: true,
   },
 ];
@@ -134,7 +134,7 @@ export async function createBook(
     slug,
     currency: book.currency || "NGN",
     inStock: book.inStock ?? true,
-    author: book.author || "Ven. Victor A. Onosemuode JP",
+    author: book.author || "Ven. Victor A. Onosemuode JP (Rtd.)",
     createdAt: new Date(),
     updatedAt: new Date(),
   });

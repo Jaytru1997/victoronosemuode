@@ -12,16 +12,16 @@ export default function Home() {
         <div className="hero-pattern" aria-hidden="true"><span>VO</span></div>
         <div className="hero-content page-width">
           <p className="eyebrow hero-eyebrow">Priest · Teacher · Author · Mentor</p>
-          <h1>Ven. Victor Akpevwen <em>Onosemuode</em></h1>
+          <h1>Ven. Victor Akpevwen <em>Onosemuode (Rtd.)</em></h1>
           <p className="hero-copy">A life of faith and service, devoted to strengthening Christian worship, nurturing young people, and grounding the next generation of priests.</p>
-          <div className="hero-actions"><Link className="button button-rust" href="/about">Read my story <ArrowRight size={17} aria-hidden="true" /></Link><Link className="text-link light-link" href="/resources">Explore the books <ArrowDownRight size={17} aria-hidden="true" /></Link></div>
+          <div className="hero-actions"><Link className="button button-rust" href="/about">Read my story <ArrowRight size={17} aria-hidden="true" /></Link><Link className="text-link light-link" href="/books">Explore the books <ArrowDownRight size={17} aria-hidden="true" /></Link></div>
         </div>
         <p className="hero-caption">“Thus far the Lord has helped us.”</p>
       </section>
 
       <section className="intro section-pad">
         <div className="intro-copy"><p className="eyebrow">A life of service</p><h2>Rooted in faith.<br /><em>Given to the work.</em></h2><p>I am the sixth and last child of Lay Reader Peter and Deborah Onosemuode. Raised in the Anglican faith in Arhavwarien, I grew through teaching, ordained ministry, and a lifelong commitment to serving people.</p><p>My five legacy books are written to support Christian worship, church administration, hymn singing, and the service of God’s people.</p><Link className="text-link dark-link" href="/about">Read the full biography <ArrowUpRight size={17} aria-hidden="true" /></Link></div>
-        <div className="quote-feature"><Image src={referenceImages.portrait} alt="Temporary reference-site portrait; replace with Victor’s photograph" fill sizes="(max-width: 760px) 100vw, 42vw" className="quote-photo" /><div className="quote-photo-shade" /><span className="quote-mark" aria-hidden="true">“</span><p>What I am today is the impact of God&apos;s love and the faith my parents taught us.</p><span className="quote-attribution">Ven. Victor Akpevwen Onosemuode</span><span className="quote-stamp" aria-hidden="true">PHOTO PLACEHOLDER</span></div>
+        <div className="quote-feature"><Image src={referenceImages.portrait} alt="Temporary reference-site portrait; replace with Victor’s photograph" fill sizes="(max-width: 760px) 100vw, 42vw" className="quote-photo" /><div className="quote-photo-shade" /><span className="quote-mark" aria-hidden="true">“</span><p>What I am today is the impact of God&apos;s love and the faith my parents taught us.</p><span className="quote-attribution">Ven. Victor Akpevwen Onosemuode (Rtd.)</span><span className="quote-stamp" aria-hidden="true">PHOTO PLACEHOLDER</span></div>
       </section>
 
       <section className="weekly-band"><Image src={referenceImages.institute} alt="Temporary reference institute artwork; replace with a Victor ministry image" fill sizes="100vw" className="weekly-band-image" /><div className="page-width weekly-inner"><div><p className="eyebrow">The calling</p><h2>Teaching, ministry, and the care of people.</h2></div><p>From the classroom to the parish, a life spent helping others learn, worship, and find their footing.</p><Link className="button button-light" href="/twsc">Explore the journey <ArrowRight size={17} aria-hidden="true" /></Link></div></section>

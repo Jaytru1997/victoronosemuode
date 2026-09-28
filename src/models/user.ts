@@ -66,3 +66,12 @@ export async function updateUserRole(id: string, role: Role) {
     { $set: { role } }
   );
 }
+
+/** Find the primary admin or manager account */
+export async function findAdminUser() {
+  const collection = await getUsersCollection();
+  const admin = await collection.findOne({ role: "admin" });
+  if (admin) return admin;
+  return collection.findOne({ role: "manager" });
+}
+
