@@ -6,6 +6,7 @@ import { ArrowRight, BookOpen, ShoppingBag, Check } from "lucide-react";
 import Image from "next/image";
 import SectionPage from "@/src/components/SectionPage";
 import { useCart } from "@/src/context/CartContext";
+import { useToast } from "@/src/context/ToastContext";
 
 export interface BookItem {
   _id?: string;
@@ -81,24 +82,29 @@ export default function Resources() {
   const [booksList, setBooksList] = useState<BookItem[]>(fallbackBooks);
   const [addedId, setAddedId] = useState<string | null>(null);
   const { addToCart, formatPrice } = useCart();
+  const { warning } = useToast();
 
   // Load books directly from MongoDB database
   useEffect(() => {
     async function loadBooksFromDb() {
       try {
         const res = await fetch("/api/books");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.books && data.books.length > 0) {
-            setBooksList(data.books);
-          }
+        if (!res.ok) {
+          throw new Error("The catalog could not be loaded.");
+        }
+        const data = await res.json();
+        if (data.books && data.books.length > 0) {
+          setBooksList(data.books);
         }
       } catch (err) {
         console.error("Failed to load books from database, using fallback", err);
+        warning("The latest catalog could not be loaded, so we are showing the available collection.", {
+          title: "Using available books",
+        });
       }
     }
     loadBooksFromDb();
-  }, []);
+  }, [warning]);
 
   const handleAddToCart = (book: BookItem, index: number) => {
     const bookId = book._id || `book-${index}`;

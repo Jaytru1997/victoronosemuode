@@ -22,6 +22,7 @@ import {
   Check,
 } from "lucide-react";
 import { useCart } from "@/src/context/CartContext";
+import { useToast } from "@/src/context/ToastContext";
 
 interface CurrentUser {
   id: string;
@@ -166,6 +167,7 @@ export default function DashboardPage() {
   const [, startTransition] = useTransition();
 
   const { addToCart, formatPrice } = useCart();
+  const { success, error, info } = useToast();
   const [userBooks, setUserBooks] = useState<BookAdminItem[]>(authenticDefaultBooks);
   const [addedBookId, setAddedBookId] = useState<string | null>(null);
 
@@ -252,11 +254,21 @@ export default function DashboardPage() {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    startTransition(() => {
-      router.push("/login");
-      router.refresh();
-    });
+    try {
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      if (!res.ok) throw new Error("Unable to log out. Please try again.");
+
+      success("You have been logged out successfully.", { title: "Signed out" });
+      startTransition(() => {
+        router.push("/login");
+        router.refresh();
+      });
+    } catch (err) {
+      console.error("Failed to log out:", err);
+      error(err instanceof Error ? err.message : "Unable to log out. Please try again.", {
+        title: "Could not sign out",
+      });
+    }
   };
 
   const handleCreatePost = async (e: React.FormEvent) => {
@@ -281,6 +293,7 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error(data.error || "Failed to create post");
 
       setPostMessage("✅ Post created successfully!");
+      success("Post created successfully!", { title: "Post published" });
       setPostTitle("");
       setPostExcerpt("");
       setPostContent("");
@@ -293,6 +306,9 @@ export default function DashboardPage() {
       if (err instanceof Error) {
         setPostMessage(`❌ ${err.message}`);
       }
+      error(err instanceof Error ? err.message : "Failed to create post", {
+        title: "Could not create post",
+      });
     } finally {
       setPosting(false);
     }
@@ -302,11 +318,15 @@ export default function DashboardPage() {
     if (!confirm("Are you sure you want to delete this post?")) return;
     try {
       const res = await fetch(`/api/posts/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setPosts((prev) => prev.filter((p) => p._id !== id));
-      }
+      if (!res.ok) throw new Error("Failed to delete post");
+
+      setPosts((prev) => prev.filter((p) => p._id !== id));
+      success("Post deleted successfully.", { title: "Post deleted" });
     } catch (err) {
       console.error("Failed to delete post:", err);
+      error(err instanceof Error ? err.message : "Failed to delete post", {
+        title: "Could not delete post",
+      });
     }
   };
 
@@ -337,6 +357,7 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error(data.error || "Failed to add book");
 
       setBookAdminMessage("✅ Book added to database catalog successfully!");
+      success("Book added to the database catalog successfully!", { title: "Book added" });
       setNewBookTitle("");
       setNewBookNote("");
       setNewBookPrice("3500");
@@ -351,6 +372,9 @@ export default function DashboardPage() {
       } else {
         setBookAdminMessage("❌ Failed to add book to catalog");
       }
+      error(err instanceof Error ? err.message : "Failed to add book to catalog", {
+        title: "Could not add book",
+      });
     } finally {
       setBookSaving(false);
     }
@@ -366,9 +390,10 @@ export default function DashboardPage() {
       const r = await fetch("/api/books");
       const d = await r.json();
       if (d.books) setBooksAdminList(d.books);
+      success("Book deleted from the database catalog.", { title: "Book deleted" });
     } catch (err) {
       console.error("Failed to delete book:", err);
-      alert("Error deleting book from catalog");
+      error("Error deleting book from catalog", { title: "Could not delete book" });
     }
   };
 
@@ -386,10 +411,14 @@ export default function DashboardPage() {
         prev.map((u) => (u._id === userId ? { ...u, role: targetRole } : u))
       );
       setUserMessage(`✅ User role successfully updated to ${targetRole}.`);
+      success(`User role successfully updated to ${targetRole}.`, { title: "Role updated" });
     } catch (err: unknown) {
       if (err instanceof Error) {
         setUserMessage(`❌ ${err.message}`);
       }
+      error(err instanceof Error ? err.message : "Failed to update user role", {
+        title: "Could not update role",
+      });
     }
   };
 
@@ -410,6 +439,7 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error(data.error);
 
       setUserMessage("✅ User created successfully!");
+      success("User created successfully!", { title: "Account created" });
       setNewEmail("");
       setNewPassword("");
       // Refresh list
@@ -420,6 +450,9 @@ export default function DashboardPage() {
       if (err instanceof Error) {
         setUserMessage(`❌ ${err.message}`);
       }
+      error(err instanceof Error ? err.message : "Failed to create user", {
+        title: "Could not create account",
+      });
     }
   };
 
@@ -1589,7 +1622,11 @@ export default function DashboardPage() {
                     {isPurchased ? (
                       <>
                         <button
-                          onClick={() => alert(`Starting download of reading copy / study materials for "${book.title}"...`)}
+                          onClick={() =>
+                            info(`Starting download of reading copy / study materials for "${book.title}"...`, {
+                              title: "Preparing download",
+                            })
+                          }
                           style={{
                             flex: 1,
                             display: "inline-flex",

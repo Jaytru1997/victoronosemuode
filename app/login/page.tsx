@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Lock, Mail, ArrowRight, ShieldCheck, UserCheck, BookOpen } from "lucide-react";
+import { useToast } from "@/src/context/ToastContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { success, error: showToastError } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,17 +34,27 @@ export default function LoginPage() {
       }
 
       // Successfully logged in
+      success("Signed in successfully. Redirecting to your dashboard.", { title: "Welcome back" });
       router.push("/dashboard");
       router.refresh();
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
+        showToastError(err.message, { title: "Sign in failed" });
       } else {
         setError("An unexpected error occurred.");
+        showToastError("An unexpected error occurred.", { title: "Sign in failed" });
       }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInvalid = (e: React.FormEvent<HTMLFormElement>) => {
+    const input = e.target as HTMLInputElement;
+    const message = input.validationMessage || "Please complete all required fields.";
+    setError(message);
+    showToastError(message, { title: "Please check your input" });
   };
 
   const fillQuickAccount = (quickEmail: string, quickPass: string) => {
@@ -100,7 +112,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <form onSubmit={handleSubmit} onInvalid={handleInvalid} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           <div>
             <label
               htmlFor="email"

@@ -3,6 +3,8 @@ import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import { CartProvider } from "@/src/context/CartContext";
 import CartDrawer from "@/src/components/CartDrawer";
+import { ToastProvider } from "@/src/context/ToastContext";
+import ToastContainer from "@/src/components/ToastContainer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,12 +34,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body>
-        <CartProvider>
-          <Navbar />
-          <CartDrawer />
-          <main>{children}</main>
-          <Footer />
-        </CartProvider>
+        <ToastProvider>
+          <CartProvider>
+            <Navbar />
+            <CartDrawer />
+            <main>{children}</main>
+            <Footer />
+          </CartProvider>
+          <ToastContainer />
+        </ToastProvider>
       </body>
     </html>
   );

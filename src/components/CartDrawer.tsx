@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { useCart } from "@/src/context/CartContext";
+import { useToast } from "@/src/context/ToastContext";
 
 export default function CartDrawer() {
   const {
@@ -17,6 +18,7 @@ export default function CartDrawer() {
     totalAmount,
     formatPrice,
   } = useCart();
+  const { success, error } = useToast();
 
   const [checkoutStep, setCheckoutStep] = useState<"cart" | "form" | "success">("cart");
   const [submitting, setSubmitting] = useState(false);
@@ -59,11 +61,18 @@ export default function CartDrawer() {
       setOrderInfo({ orderNumber: data.orderNumber });
       setCheckoutStep("success");
       clearCart();
+      success("Your order request has been received. We will contact you to confirm payment and delivery.", {
+        title: data.orderNumber ? `Order ${data.orderNumber} received` : "Order received",
+        duration: 6000,
+      });
     } catch (err: unknown) {
       if (err instanceof Error) {
         setErrorMessage(err.message);
+        error(err.message, { title: "Order could not be placed" });
       } else {
-        setErrorMessage("An unexpected error occurred during checkout.");
+        const message = "An unexpected error occurred during checkout.";
+        setErrorMessage(message);
+        error(message, { title: "Order could not be placed" });
       }
     } finally {
       setSubmitting(false);

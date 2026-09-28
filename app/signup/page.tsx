@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { UserPlus, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { useToast } from "@/src/context/ToastContext";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { success, error: showToastError } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,12 +22,16 @@ export default function SignupPage() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match. Please verify and try again.");
+      const message = "Passwords do not match. Please verify and try again.";
+      setError(message);
+      showToastError(message, { title: "Unable to create account" });
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+      const message = "Password must be at least 6 characters long.";
+      setError(message);
+      showToastError(message, { title: "Unable to create account" });
       return;
     }
 
@@ -45,17 +51,27 @@ export default function SignupPage() {
       }
 
       // Automatically logged in, direct to dashboard
+      success("Your account has been created. Redirecting to your dashboard.", { title: "Welcome" });
       router.push("/dashboard");
       router.refresh();
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
+        showToastError(err.message, { title: "Unable to create account" });
       } else {
         setError("An unexpected error occurred.");
+        showToastError("An unexpected error occurred.", { title: "Unable to create account" });
       }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInvalid = (e: React.FormEvent<HTMLFormElement>) => {
+    const input = e.target as HTMLInputElement;
+    const message = input.validationMessage || "Please complete all required fields.";
+    setError(message);
+    showToastError(message, { title: "Please check your input" });
   };
 
   return (
@@ -118,7 +134,7 @@ export default function SignupPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.15rem" }}>
+        <form onSubmit={handleSubmit} onInvalid={handleInvalid} style={{ display: "flex", flexDirection: "column", gap: "1.15rem" }}>
           <div>
             <label
               htmlFor="name"
