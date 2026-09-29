@@ -612,1053 +612,609 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="page-width" style={{ padding: "2.5rem 1.5rem 5rem" }}>
+    <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
       {/* Top Banner / User Header */}
-      <div
-        style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          border: "1px solid #e2e8f0",
-          padding: "1.75rem 2rem",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1.5rem",
-          marginBottom: "2rem",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
-          <Link href="/" title="Return to Website" style={{ display: "inline-flex", alignItems: "center" }}>
-            <Image
-              src="/logo.png"
-              alt="Ven. Victor Akpevwen Onosemuode (Rtd.) Logo"
-              width={160}
-              height={55}
-              style={{ objectFit: "contain", maxHeight: "44px", width: "auto" }}
-              priority
-            />
-          </Link>
-          <div style={{ width: "1px", height: "36px", background: "#e2e8f0" }} />
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-              <h1 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: 0 }}>
-                {user.role === "user" ? "Member Portal" : "Administration Portal"}
-              </h1>
+      <div style={{ padding: "1.5rem 2rem 0", maxWidth: "1400px", margin: "0 auto" }}>
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "16px",
+            border: "1px solid #e2e8f0",
+            padding: "1.75rem 2rem",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "1.5rem",
+            marginBottom: "2rem",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
+            <Link href="/" title="Return to Website" style={{ display: "inline-flex", alignItems: "center" }}>
+              <Image
+                src="/logo.png"
+                alt="Ven. Victor Akpevwen Onosemuode (Rtd.) Logo"
+                width={160}
+                height={55}
+                style={{ objectFit: "contain", maxHeight: "44px", width: "auto" }}
+                priority
+              />
+            </Link>
+            <div style={{ width: "1px", height: "36px", background: "#e2e8f0" }} />
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
+                <h1 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: 0 }}>
+                  {user.role === "user" ? "Member Portal" : "Administration Portal"}
+                </h1>
+                <span
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "0.72rem",
+                    fontWeight: "800",
+                    letterSpacing: "0.06em",
+                    padding: "0.2rem 0.65rem",
+                    borderRadius: "999px",
+                    backgroundColor: roleColors[user.role].bg,
+                    color: roleColors[user.role].text,
+                    border: `1px solid ${roleColors[user.role].border}`,
+                  }}
+                >
+                  {user.role}
+                </span>
+              </div>
+              {/* Prominent User Email identification */}
+              <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
+                Logged in as: <strong style={{ color: "#0f172a" }}>{user.email}</strong>
+              </p>
+            </div>
+          </div>
+
+          {/* User avatar area with subtle sign-out */}
+          <div style={{ position: "relative" }}>
+            <button
+              onClick={() => setShowUserMenu((v) => !v)}
+              title={user.email}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.6rem",
+                padding: "0.5rem 0.9rem",
+                borderRadius: "999px",
+                border: "1px solid #e2e8f0",
+                background: "#f8fafc",
+                color: "#334155",
+                fontSize: "0.85rem",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
               <span
                 style={{
-                  textTransform: "uppercase",
-                  fontSize: "0.72rem",
-                  fontWeight: "800",
-                  letterSpacing: "0.06em",
-                  padding: "0.2rem 0.65rem",
-                  borderRadius: "999px",
-                  backgroundColor: roleColors[user.role].bg,
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  background: roleColors[user.role].bg,
                   color: roleColors[user.role].text,
                   border: `1px solid ${roleColors[user.role].border}`,
-                }}
-              >
-                {user.role}
-              </span>
-            </div>
-            {/* Prominent User Email identification */}
-            <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
-              Logged in as: <strong style={{ color: "#0f172a" }}>{user.email}</strong>
-            </p>
-          </div>
-        </div>
-
-        {/* User avatar area with subtle sign-out */}
-        <div style={{ position: "relative" }}>
-          <button
-            onClick={() => setShowUserMenu((v) => !v)}
-            title={user.email}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.6rem",
-              padding: "0.5rem 0.9rem",
-              borderRadius: "999px",
-              border: "1px solid #e2e8f0",
-              background: "#f8fafc",
-              color: "#334155",
-              fontSize: "0.85rem",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-          >
-            <span
-              style={{
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                background: roleColors[user.role].bg,
-                color: roleColors[user.role].text,
-                border: `1px solid ${roleColors[user.role].border}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "0.82rem",
-                fontWeight: "800",
-                flexShrink: 0,
-              }}
-            >
-              {(user.name || user.email).charAt(0).toUpperCase()}
-            </span>
-            <span style={{ maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {user.name || user.email}
-            </span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
-          </button>
-          {showUserMenu && (
-            <div
-              style={{
-                position: "absolute",
-                top: "calc(100% + 8px)",
-                right: 0,
-                background: "#ffffff",
-                border: "1px solid #e2e8f0",
-                borderRadius: "12px",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
-                minWidth: "200px",
-                zIndex: 100,
-                overflow: "hidden",
-              }}
-            >
-              <div style={{ padding: "0.85rem 1rem", borderBottom: "1px solid #f1f5f9" }}>
-                <p style={{ fontSize: "0.78rem", color: "#94a3b8", margin: "0 0 0.15rem" }}>Signed in as</p>
-                <p style={{ fontSize: "0.85rem", fontWeight: "700", color: "#0f172a", margin: 0, wordBreak: "break-all" }}>{user.email}</p>
-              </div>
-              <button
-                onClick={() => { setShowUserMenu(false); logout(); }}
-                style={{
-                  width: "100%",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.6rem",
-                  padding: "0.75rem 1rem",
-                  background: "none",
-                  border: "none",
-                  color: "#dc2626",
-                  fontSize: "0.88rem",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  textAlign: "left",
+                  justifyContent: "center",
+                  fontSize: "0.82rem",
+                  fontWeight: "800",
+                  flexShrink: 0,
                 }}
               >
-                <LogOut size={15} /> Sign Out
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-
-      {/* Tabs Navigation */}
-      <div
-        style={{
-          display: "flex",
-          gap: "0.5rem",
-          borderBottom: "1px solid #e2e8f0",
-          marginBottom: "2rem",
-          paddingBottom: "0.5rem",
-          overflowX: "auto",
-        }}
-      >
-        {/* Admin Approvals Tab */}
-        {(user.role === "admin" || user.role === "manager") && (
-          <button
-            onClick={() => setActiveTab("approvals")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.6rem 1rem",
-              borderRadius: "8px",
-              border: "none",
-              background: activeTab === "approvals" ? "#1e3a8a" : "transparent",
-              color: activeTab === "approvals" ? "#ffffff" : "#475569",
-              fontWeight: "650",
-              fontSize: "0.92rem",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <CreditCard size={17} /> Payment Approvals
-            {pendingOrders.length > 0 && (
-              <span
+                {(user.name || user.email).charAt(0).toUpperCase()}
+              </span>
+              <span style={{ maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {user.name || user.email}
+              </span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
+            </button>
+            {showUserMenu && (
+              <div
                 style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  right: 0,
+                  background: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "12px",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+                  minWidth: "200px",
+                  zIndex: 100,
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ padding: "0.85rem 1rem", borderBottom: "1px solid #f1f5f9" }}>
+                  <p style={{ fontSize: "0.78rem", color: "#94a3b8", margin: "0 0 0.15rem" }}>Signed in as</p>
+                  <p style={{ fontSize: "0.85rem", fontWeight: "700", color: "#0f172a", margin: 0, wordBreak: "break-all" }}>{user.email}</p>
+                </div>
+                <button
+                  onClick={() => { setShowUserMenu(false); logout(); }}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.6rem",
+                    padding: "0.75rem 1rem",
+                    background: "none",
+                    border: "none",
+                    color: "#dc2626",
+                    fontSize: "0.88rem",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <LogOut size={15} /> Sign Out
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>{/* end header wrapper */}
+
+      {/* Sidebar + Content Layout */}
+      <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", gap: "0", alignItems: "flex-start", padding: "1.5rem 2rem 5rem" }}>
+
+        {/* ── Sidebar ── */}
+        <aside style={{
+          width: "240px",
+          flexShrink: 0,
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: "16px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+          padding: "1.25rem 0.75rem",
+          position: "sticky",
+          top: "80px",
+          marginRight: "1.5rem",
+          alignSelf: "flex-start",
+        }}>
+          <p style={{ fontSize: "0.7rem", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.08em", color: "#94a3b8", padding: "0 0.75rem", marginBottom: "0.5rem" }}>Navigation</p>
+
+          {/* Admin Approvals Tab */}
+          {(user.role === "admin" || user.role === "manager") && (
+            <button
+              onClick={() => setActiveTab("approvals")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.65rem",
+                width: "100%",
+                padding: "0.65rem 0.75rem",
+                borderRadius: "10px",
+                border: "none",
+                background: activeTab === "approvals" ? "#1e3a8a" : "transparent",
+                color: activeTab === "approvals" ? "#ffffff" : "#475569",
+                fontWeight: "600",
+                fontSize: "0.88rem",
+                cursor: "pointer",
+                textAlign: "left",
+                marginBottom: "2px",
+                transition: "background 0.15s, color 0.15s",
+              }}
+            >
+              <CreditCard size={16} style={{ flexShrink: 0 }} /> Payment Approvals
+              {pendingOrders.length > 0 && (
+                <span style={{
+                  marginLeft: "auto",
                   background: activeTab === "approvals" ? "#ef4444" : "#fee2e2",
                   color: activeTab === "approvals" ? "#ffffff" : "#b91c1c",
-                  fontSize: "11px",
+                  fontSize: "10px",
                   fontWeight: "800",
                   padding: "1px 6px",
                   borderRadius: "999px",
-                }}
-              >
-                {pendingOrders.length}
-              </span>
-            )}
-          </button>
-        )}
+                  flexShrink: 0,
+                }}>{pendingOrders.length}</span>
+              )}
+            </button>
+          )}
 
-        {/* Regular User Tab 1: Pending Payments */}
-        <button
-          onClick={() => setActiveTab("pending-payments")}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.6rem 1rem",
-            borderRadius: "8px",
-            border: "none",
-            background: activeTab === "pending-payments" ? "#1e3a8a" : "transparent",
-            color: activeTab === "pending-payments" ? "#ffffff" : "#475569",
-            fontWeight: "650",
-            fontSize: "0.92rem",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <CreditCard size={17} /> Pending Payments
-          {pendingOrders.length > 0 && (
-            <span
-              style={{
+          {/* Pending Payments */}
+          <button
+            onClick={() => setActiveTab("pending-payments")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.65rem",
+              width: "100%",
+              padding: "0.65rem 0.75rem",
+              borderRadius: "10px",
+              border: "none",
+              background: activeTab === "pending-payments" ? "#1e3a8a" : "transparent",
+              color: activeTab === "pending-payments" ? "#ffffff" : "#475569",
+              fontWeight: "600",
+              fontSize: "0.88rem",
+              cursor: "pointer",
+              textAlign: "left",
+              marginBottom: "2px",
+              transition: "background 0.15s, color 0.15s",
+            }}
+          >
+            <CreditCard size={16} style={{ flexShrink: 0 }} /> Pending Payments
+            {pendingOrders.length > 0 && (
+              <span style={{
+                marginLeft: "auto",
                 background: activeTab === "pending-payments" ? "#ef4444" : "#fee2e2",
                 color: activeTab === "pending-payments" ? "#ffffff" : "#b91c1c",
-                fontSize: "11px",
+                fontSize: "10px",
                 fontWeight: "800",
                 padding: "1px 6px",
                 borderRadius: "999px",
-              }}
-            >
-              {pendingOrders.length}
-            </span>
-          )}
-        </button>
+                flexShrink: 0,
+              }}>{pendingOrders.length}</span>
+            )}
+          </button>
 
-        {/* User Tab 2: Purchased Books & Resources */}
-        <button
-          onClick={() => setActiveTab("purchased-books")}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.6rem 1rem",
-            borderRadius: "8px",
-            border: "none",
-            background: activeTab === "purchased-books" ? "#1e3a8a" : "transparent",
-            color: activeTab === "purchased-books" ? "#ffffff" : "#475569",
-            fontWeight: "650",
-            fontSize: "0.92rem",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <BookOpen size={17} /> Purchased Books &amp; Resources
-          <span
+          {/* Purchased Books */}
+          <button
+            onClick={() => setActiveTab("purchased-books")}
             style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.65rem",
+              width: "100%",
+              padding: "0.65rem 0.75rem",
+              borderRadius: "10px",
+              border: "none",
+              background: activeTab === "purchased-books" ? "#1e3a8a" : "transparent",
+              color: activeTab === "purchased-books" ? "#ffffff" : "#475569",
+              fontWeight: "600",
+              fontSize: "0.88rem",
+              cursor: "pointer",
+              textAlign: "left",
+              marginBottom: "2px",
+              transition: "background 0.15s, color 0.15s",
+            }}
+          >
+            <BookOpen size={16} style={{ flexShrink: 0 }} /> Purchased Books
+            <span style={{
+              marginLeft: "auto",
               background: activeTab === "purchased-books" ? "rgba(255,255,255,0.2)" : "#f1f5f9",
               color: activeTab === "purchased-books" ? "#ffffff" : "#64748b",
-              fontSize: "11px",
+              fontSize: "10px",
               fontWeight: "800",
               padding: "1px 6px",
               borderRadius: "999px",
+              flexShrink: 0,
+            }}>{purchasedBooksList.length}</span>
+          </button>
+
+          {/* Scheduled Events */}
+          <button
+            onClick={() => setActiveTab("scheduled-events")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.65rem",
+              width: "100%",
+              padding: "0.65rem 0.75rem",
+              borderRadius: "10px",
+              border: "none",
+              background: activeTab === "scheduled-events" ? "#1e3a8a" : "transparent",
+              color: activeTab === "scheduled-events" ? "#ffffff" : "#475569",
+              fontWeight: "600",
+              fontSize: "0.88rem",
+              cursor: "pointer",
+              textAlign: "left",
+              marginBottom: "2px",
+              transition: "background 0.15s, color 0.15s",
             }}
           >
-            {purchasedBooksList.length}
-          </span>
-        </button>
-
-        {/* User Tab 3: Scheduled Events & Consultations */}
-        <button
-          onClick={() => setActiveTab("scheduled-events")}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.6rem 1rem",
-            borderRadius: "8px",
-            border: "none",
-            background: activeTab === "scheduled-events" ? "#1e3a8a" : "transparent",
-            color: activeTab === "scheduled-events" ? "#ffffff" : "#475569",
-            fontWeight: "650",
-            fontSize: "0.92rem",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <Calendar size={17} /> Scheduled Events
-          <span
-            style={{
+            <Calendar size={16} style={{ flexShrink: 0 }} /> Scheduled Events
+            <span style={{
+              marginLeft: "auto",
               background: activeTab === "scheduled-events" ? "rgba(255,255,255,0.2)" : "#f1f5f9",
               color: activeTab === "scheduled-events" ? "#ffffff" : "#64748b",
-              fontSize: "11px",
+              fontSize: "10px",
               fontWeight: "800",
               padding: "1px 6px",
               borderRadius: "999px",
-            }}
-          >
-            {reservations.length + meetings.length}
-          </span>
-        </button>
+              flexShrink: 0,
+            }}>{reservations.length + meetings.length}</span>
+          </button>
 
-        {/* Admin Management Tabs */}
-        {(user.role === "admin" || user.role === "manager") && (
-          <>
-            <button
-              onClick={() => setActiveTab("posts")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.6rem 1rem",
-                borderRadius: "8px",
-                border: "none",
-                background: activeTab === "posts" ? "#1e3a8a" : "transparent",
-                color: activeTab === "posts" ? "#ffffff" : "#475569",
-                fontWeight: "650",
-                fontSize: "0.92rem",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <PenTool size={17} /> Manage Posts
-            </button>
+          {/* Admin-only section */}
+          {(user.role === "admin" || user.role === "manager") && (
+            <>
+              <div style={{ height: "1px", background: "#f1f5f9", margin: "0.75rem 0.75rem" }} />
+              <p style={{ fontSize: "0.7rem", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.08em", color: "#94a3b8", padding: "0 0.75rem", marginBottom: "0.5rem" }}>Admin</p>
 
-            <button
-              onClick={() => setActiveTab("books")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.6rem 1rem",
-                borderRadius: "8px",
-                border: "none",
-                background: activeTab === "books" ? "#1e3a8a" : "transparent",
-                color: activeTab === "books" ? "#ffffff" : "#475569",
-                fontWeight: "650",
-                fontSize: "0.92rem",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <Library size={17} /> Manage Catalog
-            </button>
-
-            <button
-              onClick={() => setActiveTab("users")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.6rem 1rem",
-                borderRadius: "8px",
-                border: "none",
-                background: activeTab === "users" ? "#1e3a8a" : "transparent",
-                color: activeTab === "users" ? "#ffffff" : "#475569",
-                fontWeight: "650",
-                fontSize: "0.92rem",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <Users size={17} /> User Directory
-            </button>
-
-            <button
-              onClick={() => setActiveTab("schedule")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.6rem 1rem",
-                borderRadius: "8px",
-                border: "none",
-                background: activeTab === "schedule" ? "#1e3a8a" : "transparent",
-                color: activeTab === "schedule" ? "#ffffff" : "#475569",
-                fontWeight: "650",
-                fontSize: "0.92rem",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <Calendar size={17} /> All Meetings
-              {meetings.filter((m) => m.status === "pending").length > 0 && (
-                <span style={{
-                  background: activeTab === "schedule" ? "#ef4444" : "#fee2e2",
-                  color: activeTab === "schedule" ? "#ffffff" : "#b91c1c",
-                  fontSize: "11px",
-                  fontWeight: "800",
-                  padding: "1px 6px",
-                  borderRadius: "999px",
-                }}>
-                  {meetings.filter((m) => m.status === "pending").length}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab("events")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.6rem 1rem",
-                borderRadius: "8px",
-                border: "none",
-                background: activeTab === "events" ? "#1e3a8a" : "transparent",
-                color: activeTab === "events" ? "#ffffff" : "#475569",
-                fontWeight: "650",
-                fontSize: "0.92rem",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <Ticket size={17} /> Speaking Events
-              <span
+              <button
+                onClick={() => setActiveTab("posts")}
                 style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.65rem",
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
+                  borderRadius: "10px",
+                  border: "none",
+                  background: activeTab === "posts" ? "#1e3a8a" : "transparent",
+                  color: activeTab === "posts" ? "#ffffff" : "#475569",
+                  fontWeight: "600",
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  marginBottom: "2px",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                <PenTool size={16} style={{ flexShrink: 0 }} /> Manage Posts
+              </button>
+
+              <button
+                onClick={() => setActiveTab("books")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.65rem",
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
+                  borderRadius: "10px",
+                  border: "none",
+                  background: activeTab === "books" ? "#1e3a8a" : "transparent",
+                  color: activeTab === "books" ? "#ffffff" : "#475569",
+                  fontWeight: "600",
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  marginBottom: "2px",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                <Library size={16} style={{ flexShrink: 0 }} /> Manage Catalog
+              </button>
+
+              <button
+                onClick={() => setActiveTab("users")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.65rem",
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
+                  borderRadius: "10px",
+                  border: "none",
+                  background: activeTab === "users" ? "#1e3a8a" : "transparent",
+                  color: activeTab === "users" ? "#ffffff" : "#475569",
+                  fontWeight: "600",
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  marginBottom: "2px",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                <Users size={16} style={{ flexShrink: 0 }} /> User Directory
+              </button>
+
+              <button
+                onClick={() => setActiveTab("schedule")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.65rem",
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
+                  borderRadius: "10px",
+                  border: "none",
+                  background: activeTab === "schedule" ? "#1e3a8a" : "transparent",
+                  color: activeTab === "schedule" ? "#ffffff" : "#475569",
+                  fontWeight: "600",
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  marginBottom: "2px",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                <Calendar size={16} style={{ flexShrink: 0 }} /> All Meetings
+                {meetings.filter((m) => m.status === "pending").length > 0 && (
+                  <span style={{
+                    marginLeft: "auto",
+                    background: activeTab === "schedule" ? "#ef4444" : "#fee2e2",
+                    color: activeTab === "schedule" ? "#ffffff" : "#b91c1c",
+                    fontSize: "10px",
+                    fontWeight: "800",
+                    padding: "1px 6px",
+                    borderRadius: "999px",
+                    flexShrink: 0,
+                  }}>{meetings.filter((m) => m.status === "pending").length}</span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setActiveTab("events")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.65rem",
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
+                  borderRadius: "10px",
+                  border: "none",
+                  background: activeTab === "events" ? "#1e3a8a" : "transparent",
+                  color: activeTab === "events" ? "#ffffff" : "#475569",
+                  fontWeight: "600",
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  marginBottom: "2px",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                <Ticket size={16} style={{ flexShrink: 0 }} /> Speaking Events
+                <span style={{
+                  marginLeft: "auto",
                   background: activeTab === "events" ? "rgba(255,255,255,0.2)" : "#f1f5f9",
                   color: activeTab === "events" ? "#ffffff" : "#64748b",
-                  fontSize: "11px",
+                  fontSize: "10px",
                   fontWeight: "800",
                   padding: "1px 6px",
                   borderRadius: "999px",
-                }}
-              >
-                {eventsList.length}
-              </span>
-            </button>
-          </>
-        )}
-      </div>
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 1: PENDING PAYMENTS (User View)                           */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "pending-payments" && (
-        <div>
-          <div style={{ marginBottom: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
-              Pending Bank Transfer Payments
-            </h2>
-            <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
-              Orders awaiting administrative verification. Once confirmed, books are automatically unlocked in your Purchased Books tab.
-            </p>
-          </div>
-
-          {pendingOrders.length === 0 ? (
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e2e8f0",
-                borderRadius: "14px",
-                padding: "3.5rem 1.5rem",
-                textAlign: "center",
-              }}
-            >
-              <CheckCircle2 size={46} color="#16a34a" style={{ margin: "0 auto 1rem", opacity: 0.8 }} />
-              <h3 style={{ fontSize: "1.15rem", fontWeight: "700", color: "#0f172a", margin: "0 0 0.4rem" }}>
-                No Pending Payments
-              </h3>
-              <p style={{ color: "#64748b", fontSize: "0.9rem", maxWidth: "420px", margin: "0 auto 1.5rem" }}>
-                You have no outstanding bank transfer payments awaiting admin approval.
-              </p>
-              <Link
-                href="/books"
-                className="button button-rust"
-                style={{ minHeight: "42px", padding: "0 1.25rem", fontSize: "0.85rem" }}
-              >
-                Browse Books Catalog
-              </Link>
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              {pendingOrders.map((order) => (
-                <div
-                  key={order._id}
-                  style={{
-                    background: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "14px",
-                    padding: "1.5rem",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      flexWrap: "wrap",
-                      gap: "1rem",
-                      marginBottom: "1rem",
-                      paddingBottom: "1rem",
-                      borderBottom: "1px solid #f1f5f9",
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.3rem" }}>
-                        <span style={{ fontFamily: "monospace", fontWeight: "800", fontSize: "1.05rem", color: "var(--rust, #a64b32)" }}>
-                          {order.orderNumber}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: "0.72rem",
-                            fontWeight: "750",
-                            background: "#fef3c7",
-                            color: "#b45309",
-                            padding: "2px 8px",
-                            borderRadius: "999px",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "3px",
-                          }}
-                        >
-                          <Clock size={12} /> Awaiting Admin Confirmation
-                        </span>
-                      </div>
-                      <div style={{ fontSize: "0.82rem", color: "#64748b" }}>
-                        Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: "0.8rem", color: "#64748b" }}>Total Amount</div>
-                      <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "#0f172a" }}>
-                        {formatPrice(order.totalAmount)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Items list */}
-                  <div style={{ marginBottom: "1rem" }}>
-                    <div style={{ fontSize: "0.82rem", fontWeight: "700", color: "#475569", marginBottom: "0.5rem" }}>
-                      Ordered Publications:
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                      {order.items.map((item, idx) => (
-                        <div
-                          key={idx}
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            fontSize: "0.88rem",
-                            padding: "0.4rem 0.6rem",
-                            background: "#f8fafc",
-                            borderRadius: "6px",
-                          }}
-                        >
-                          <span>{item.quantity}x <strong>{item.title}</strong></span>
-                          <span>{formatPrice(item.price * item.quantity)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Transfer Details info note */}
-                  <div
-                    style={{
-                      background: "#f0fdf4",
-                      border: "1px solid #bbf7d0",
-                      borderRadius: "8px",
-                      padding: "0.75rem 1rem",
-                      fontSize: "0.85rem",
-                      color: "#166534",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                    }}
-                  >
-                    <Building size={16} style={{ flexShrink: 0 }} />
-                    <span>
-                      Direct Bank Transfer sent to <strong>Zenith Bank (Acc: 1014892014)</strong>. Once administrative review is complete, your books will be automatically available for download.
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  flexShrink: 0,
+                }}>{eventsList.length}</span>
+              </button>
+            </>
           )}
-        </div>
-      )}
 
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 2: PURCHASED BOOKS & RESOURCES (User View)                */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "purchased-books" && (
-        <div>
-          <div
+          {/* Sign out at bottom of sidebar */}
+          <div style={{ height: "1px", background: "#f1f5f9", margin: "0.75rem 0.75rem" }} />
+          <button
+            onClick={() => { logout(); }}
             style={{
-              marginBottom: "1.75rem",
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-              flexWrap: "wrap",
-              gap: "1rem",
+              alignItems: "center",
+              gap: "0.65rem",
+              width: "100%",
+              padding: "0.65rem 0.75rem",
+              borderRadius: "10px",
+              border: "none",
+              background: "transparent",
+              color: "#dc2626",
+              fontWeight: "600",
+              fontSize: "0.88rem",
+              cursor: "pointer",
+              textAlign: "left",
+              transition: "background 0.15s",
             }}
           >
+            <LogOut size={16} style={{ flexShrink: 0 }} /> Sign Out
+          </button>
+        </aside>
+
+        {/* ── Main Content ── */}
+        <main style={{ flex: 1, minWidth: 0 }}>
+          {/* Tabs Navigation */}
+
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 1: PENDING PAYMENTS (User View)                           */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "pending-payments" && (
             <div>
-              <h2 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
-                My Purchased Books &amp; Resources
-              </h2>
-              <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
-                Access published literature, pastoral guides, and spiritual hymnbooks by Ven. Victor Akpevwen Onosemuode (Rtd.).
-              </p>
-            </div>
-            <Link
-              href="/books"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.4rem",
-                color: "var(--rust, #a64b32)",
-                fontSize: "0.9rem",
-                fontWeight: "750",
-                textDecoration: "none",
-              }}
-            >
-              Public Book Catalog <ExternalLink size={15} />
-            </Link>
-          </div>
-
-          {purchasedBooksList.length === 0 ? (
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e2e8f0",
-                borderRadius: "14px",
-                padding: "4rem 1.5rem",
-                textAlign: "center",
-              }}
-            >
-              <Library size={48} color="#94a3b8" style={{ margin: "0 auto 1.25rem", opacity: 0.6 }} />
-              <h3 style={{ fontSize: "1.2rem", fontWeight: "700", color: "#0f172a", margin: "0 0 0.4rem" }}>
-                You have not purchased any books yet
-              </h3>
-              <p style={{ color: "#64748b", fontSize: "0.92rem", maxWidth: "440px", margin: "0 auto 1.75rem", lineHeight: "1.6" }}>
-                Explore the five legacy books written by Ven. Victor Akpevwen Onosemuode (Rtd.) to nurture faith, Anglican worship, and pastoral administration.
-              </p>
-              <Link
-                href="/books"
-                className="button button-rust"
-                style={{ minHeight: "44px", padding: "0 1.5rem", fontSize: "0.88rem" }}
-              >
-                Browse Books Catalog
-              </Link>
-            </div>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: "1.5rem",
-              }}
-            >
-              {purchasedBooksList.map((book) => (
-                <div
-                  key={book._id || book.title}
-                  style={{
-                    background: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "14px",
-                    padding: "1.5rem",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
-                    gap: "1.25rem",
-                  }}
-                >
-                  <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
-                    <div
-                      style={{
-                        position: "relative",
-                        width: "85px",
-                        height: "115px",
-                        background: "radial-gradient(circle, #f8f7f1 0%, #ebe7dc 100%)",
-                        borderRadius: "8px",
-                        overflow: "hidden",
-                        flexShrink: 0,
-                        border: "1px solid #e2e8f0",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Image
-                        src={book.coverImage || "/annual-vestry-meeting-poster.png"}
-                        alt={book.title}
-                        fill
-                        sizes="100px"
-                        style={{ objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.18))" }}
-                      />
-                    </div>
-
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <span
-                        style={{
-                          fontSize: "0.72rem",
-                          fontWeight: "750",
-                          textTransform: "uppercase",
-                          padding: "0.15rem 0.5rem",
-                          borderRadius: "4px",
-                          background: "#f1f5f9",
-                          color: "#475569",
-                          display: "inline-block",
-                          marginBottom: "0.35rem",
-                        }}
-                      >
-                        {book.category || "Christian Literature"}
-                      </span>
-                      <h3
-                        style={{
-                          margin: "0 0 0.35rem",
-                          fontSize: "1.05rem",
-                          fontFamily: "Georgia, serif",
-                          lineHeight: "1.3",
-                          color: "var(--ink, #173a32)",
-                        }}
-                      >
-                        {book.title}
-                      </h3>
-                      <div
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.3rem",
-                          fontSize: "0.75rem",
-                          fontWeight: "750",
-                          color: "#16a34a",
-                          background: "#dcfce7",
-                          padding: "0.15rem 0.55rem",
-                          borderRadius: "999px",
-                        }}
-                      >
-                        <CheckCircle size={12} /> Unlocked
-                      </div>
-                    </div>
-                  </div>
-
-                  <p style={{ margin: 0, fontSize: "0.85rem", color: "#64748b", lineHeight: "1.5" }}>
-                    {book.note}
-                  </p>
-
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <a
-                      href={book.coverImage || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="button button-rust"
-                      style={{
-                        flex: 1,
-                        minHeight: "38px",
-                        padding: "0 0.75rem",
-                        fontSize: "0.78rem",
-                        borderRadius: "6px",
-                      }}
-                    >
-                      <Download size={14} /> Download Study Guide
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 3: SCHEDULED EVENTS & CONSULTATIONS (User View)           */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "scheduled-events" && (
-        <div>
-          <div
-            style={{
-              marginBottom: "1.75rem",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-              flexWrap: "wrap",
-              gap: "1rem",
-            }}
-          >
-            <div>
-              <h2 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
-                My Scheduled Events &amp; Consultations
-              </h2>
-              <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
-                Speaking engagements where you have reserved seats, plus any personal meetings scheduled with Ven. Victor Onosemuode (Rtd.).
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: "0.75rem" }}>
-              <Link
-                href="/events"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                  color: "var(--rust, #a64b32)",
-                  fontSize: "0.88rem",
-                  fontWeight: "750",
-                }}
-              >
-                Speaking Events <ExternalLink size={14} />
-              </Link>
-              <Link
-                href="/calendar"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                  color: "#1e3a8a",
-                  fontSize: "0.88rem",
-                  fontWeight: "750",
-                }}
-              >
-                Calendar Booking <ExternalLink size={14} />
-              </Link>
-            </div>
-          </div>
-
-          {reservations.length === 0 && meetings.length === 0 ? (
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e2e8f0",
-                borderRadius: "14px",
-                padding: "3.5rem 1.5rem",
-                textAlign: "center",
-              }}
-            >
-              <Calendar size={48} color="#94a3b8" style={{ margin: "0 auto 1.25rem", opacity: 0.6 }} />
-              <h3 style={{ fontSize: "1.15rem", fontWeight: "700", color: "#0f172a", margin: "0 0 0.4rem" }}>
-                No Scheduled Events or Meetings
-              </h3>
-              <p style={{ color: "#64748b", fontSize: "0.9rem", maxWidth: "420px", margin: "0 auto 1.5rem" }}>
-                You have not booked any event seat reservations or scheduled consultations yet.
-              </p>
-              <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
-                <Link
-                  href="/events"
-                  className="button button-rust"
-                  style={{ minHeight: "42px", padding: "0 1.25rem", fontSize: "0.85rem" }}
-                >
-                  <Ticket size={14} /> Reserve Event Seat
-                </Link>
-                <Link
-                  href="/calendar"
-                  style={{
-                    padding: "0 1.25rem",
-                    borderRadius: "6px",
-                    border: "1px solid #cbd5e1",
-                    background: "#ffffff",
-                    color: "#334155",
-                    fontSize: "0.85rem",
-                    fontWeight: "600",
-                    display: "inline-flex",
-                    alignItems: "center",
-                  }}
-                >
-                  Book Meeting
-                </Link>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <h2 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
+                  Pending Bank Transfer Payments
+                </h2>
+                <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
+                  Orders awaiting administrative verification. Once confirmed, books are automatically unlocked in your Purchased Books tab.
+                </p>
               </div>
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              {/* Event Reservations */}
-              {reservations.length > 0 && (
-                <div>
-                  <h3 style={{ fontSize: "1.05rem", fontWeight: "700", color: "#334155", marginBottom: "0.75rem" }}>
-                    Speaking Event Reservations ({reservations.length})
+
+              {pendingOrders.length === 0 ? (
+                <div
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "14px",
+                    padding: "3.5rem 1.5rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <CheckCircle2 size={46} color="#16a34a" style={{ margin: "0 auto 1rem", opacity: 0.8 }} />
+                  <h3 style={{ fontSize: "1.15rem", fontWeight: "700", color: "#0f172a", margin: "0 0 0.4rem" }}>
+                    No Pending Payments
                   </h3>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem" }}>
-                    {reservations.map((res) => (
-                      <div
-                        key={res._id}
-                        style={{
-                          background: "#ffffff",
-                          border: "1px solid #e2e8f0",
-                          borderRadius: "12px",
-                          padding: "1.25rem",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                          <span style={{ fontFamily: "monospace", fontSize: "0.82rem", fontWeight: "800", color: "var(--rust, #a64b32)" }}>
-                            {res.reservationCode}
-                          </span>
-                          <span style={{ fontSize: "0.72rem", fontWeight: "750", background: "#dcfce7", color: "#166534", padding: "2px 8px", borderRadius: "999px" }}>
-                            {res.seatsCount} {res.seatsCount === 1 ? "Seat" : "Seats"} Confirmed
-                          </span>
-                        </div>
-                        <h4 style={{ margin: "0 0 0.5rem", fontSize: "1rem", color: "var(--ink, #173a32)", fontFamily: "Georgia, serif" }}>
-                          {res.eventTitle}
-                        </h4>
-                        <div style={{ fontSize: "0.82rem", color: "#475569", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-                          <div><Calendar size={13} style={{ display: "inline", marginRight: "4px" }} /> {res.eventDate}</div>
-                          <div><MapPin size={13} style={{ display: "inline", marginRight: "4px" }} /> {res.eventVenue}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Consultation Meetings */}
-              {meetings.length > 0 && (
-                <div>
-                  <h3 style={{ fontSize: "1.05rem", fontWeight: "700", color: "#334155", marginBottom: "0.75rem" }}>
-                    Consultation Meetings ({meetings.length})
-                  </h3>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem" }}>
-                    {meetings.map((m) => (
-                      <div
-                        key={m._id}
-                        style={{
-                          background: "#ffffff",
-                          border: "1px solid #e2e8f0",
-                          borderRadius: "12px",
-                          padding: "1.25rem",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                          <span style={{ fontSize: "0.75rem", fontWeight: "750", textTransform: "uppercase", color: "#1e3a8a" }}>
-                            Consultation
-                          </span>
-                          <span style={{ fontSize: "0.72rem", fontWeight: "750", background: "#e0e7ff", color: "#3730a3", padding: "2px 8px", borderRadius: "999px" }}>
-                            {m.status}
-                          </span>
-                        </div>
-                        <h4 style={{ margin: "0 0 0.4rem", fontSize: "1rem", color: "var(--ink, #173a32)" }}>
-                          {m.title}
-                        </h4>
-                        <div style={{ fontSize: "0.82rem", color: "#475569", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-                          <div><Clock size={13} style={{ display: "inline", marginRight: "4px" }} /> {new Date(m.startTime).toLocaleString()}</div>
-                          {m.location && <div><MapPin size={13} style={{ display: "inline", marginRight: "4px" }} /> {m.location}</div>}
-                          {m.meetingUrl && <div><Video size={13} style={{ display: "inline", marginRight: "4px" }} /> <a href={m.meetingUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#1e3a8a", textDecoration: "underline" }}>Join Online Meeting</a></div>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 4: PAYMENT APPROVALS (Admin & Manager View)               */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "approvals" && (user.role === "admin" || user.role === "manager") && (
-        <div>
-          <div style={{ marginBottom: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
-              Bank Transfer Payment Approvals
-            </h2>
-            <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
-              Review customer payment transfers sent to Zenith Bank. Confirming an order immediately unlocks the books in that user&apos;s account.
-            </p>
-          </div>
-
-          {pendingOrders.length === 0 ? (
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e2e8f0",
-                borderRadius: "14px",
-                padding: "3.5rem 1.5rem",
-                textAlign: "center",
-              }}
-            >
-              <CheckCircle2 size={46} color="#16a34a" style={{ margin: "0 auto 1rem", opacity: 0.8 }} />
-              <h3 style={{ fontSize: "1.15rem", fontWeight: "700", color: "#0f172a", margin: "0 0 0.4rem" }}>
-                All Payments Cleared!
-              </h3>
-              <p style={{ color: "#64748b", fontSize: "0.9rem" }}>
-                There are no pending bank transfers awaiting review at this time.
-              </p>
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              {pendingOrders.map((order) => {
-                const isApproving = approvingOrderId === order._id;
-                const addr = order.deliveryAddress;
-                const fullAddressString = [
-                  addr?.street,
-                  addr?.city,
-                  addr?.state,
-                  addr?.postalCode,
-                  addr?.country,
-                ]
-                  .filter(Boolean)
-                  .join(", ");
-
-                return (
-                  <div
-                    key={order._id}
-                    style={{
-                      background: "#ffffff",
-                      border: "1.5px solid #cbd5e1",
-                      borderRadius: "14px",
-                      padding: "1.5rem",
-                      boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
-                    }}
+                  <p style={{ color: "#64748b", fontSize: "0.9rem", maxWidth: "420px", margin: "0 auto 1.5rem" }}>
+                    You have no outstanding bank transfer payments awaiting admin approval.
+                  </p>
+                  <Link
+                    href="/books"
+                    className="button button-rust"
+                    style={{ minHeight: "42px", padding: "0 1.25rem", fontSize: "0.85rem" }}
                   >
+                    Browse Books Catalog
+                  </Link>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                  {pendingOrders.map((order) => (
                     <div
+                      key={order._id}
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        flexWrap: "wrap",
-                        gap: "1rem",
-                        marginBottom: "1rem",
-                        paddingBottom: "1rem",
-                        borderBottom: "1px solid #f1f5f9",
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.3rem" }}>
-                          <span style={{ fontFamily: "monospace", fontSize: "1.15rem", fontWeight: "850", color: "var(--rust, #a64b32)" }}>
-                            {order.orderNumber}
-                          </span>
-                          <span style={{ fontSize: "0.72rem", fontWeight: "750", background: "#fef3c7", color: "#b45309", padding: "2px 8px", borderRadius: "999px" }}>
-                            Payment Submitted
-                          </span>
-                        </div>
-                        <div style={{ fontSize: "0.85rem", color: "#475569" }}>
-                          Customer: <strong>{order.customerName}</strong> ({order.customerEmail}) · Phone: {order.customerPhone || "N/A"}
-                        </div>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: "0.8rem", color: "#64748b" }}>Order Total</div>
-                        <div style={{ fontSize: "1.35rem", fontWeight: "850", color: "#166534" }}>
-                          {formatPrice(order.totalAmount)}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 5-part Delivery Address breakdown */}
-                    <div
-                      style={{
-                        background: "#f8fafc",
+                        background: "#ffffff",
                         border: "1px solid #e2e8f0",
-                        borderRadius: "8px",
-                        padding: "0.85rem 1rem",
-                        fontSize: "0.85rem",
-                        color: "#334155",
-                        marginBottom: "1rem",
+                        borderRadius: "14px",
+                        padding: "1.5rem",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
                       }}
                     >
-                      <div style={{ fontWeight: "750", marginBottom: "0.25rem", color: "#0f172a" }}>
-                        5-Part Delivery Address:
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          flexWrap: "wrap",
+                          gap: "1rem",
+                          marginBottom: "1rem",
+                          paddingBottom: "1rem",
+                          borderBottom: "1px solid #f1f5f9",
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.3rem" }}>
+                            <span style={{ fontFamily: "monospace", fontWeight: "800", fontSize: "1.05rem", color: "var(--rust, #a64b32)" }}>
+                              {order.orderNumber}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "0.72rem",
+                                fontWeight: "750",
+                                background: "#fef3c7",
+                                color: "#b45309",
+                                padding: "2px 8px",
+                                borderRadius: "999px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "3px",
+                              }}
+                            >
+                              <Clock size={12} /> Awaiting Admin Confirmation
+                            </span>
+                          </div>
+                          <div style={{ fontSize: "0.82rem", color: "#64748b" }}>
+                            Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: "0.8rem", color: "#64748b" }}>Total Amount</div>
+                          <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "#0f172a" }}>
+                            {formatPrice(order.totalAmount)}
+                          </div>
+                        </div>
                       </div>
-                      <div>{fullAddressString || "Address not provided"}</div>
-                    </div>
 
-                    {/* Sender payment note if provided */}
-                    {order.senderDetails && (
+                      {/* Items list */}
+                      <div style={{ marginBottom: "1rem" }}>
+                        <div style={{ fontSize: "0.82rem", fontWeight: "700", color: "#475569", marginBottom: "0.5rem" }}>
+                          Ordered Publications:
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                          {order.items.map((item, idx) => (
+                            <div
+                              key={idx}
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                fontSize: "0.88rem",
+                                padding: "0.4rem 0.6rem",
+                                background: "#f8fafc",
+                                borderRadius: "6px",
+                              }}
+                            >
+                              <span>{item.quantity}x <strong>{item.title}</strong></span>
+                              <span>{formatPrice(item.price * item.quantity)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Transfer Details info note */}
                       <div
                         style={{
                           background: "#f0fdf4",
@@ -1667,468 +1223,582 @@ export default function DashboardPage() {
                           padding: "0.75rem 1rem",
                           fontSize: "0.85rem",
                           color: "#166534",
-                          marginBottom: "1rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
                         }}
                       >
-                        <strong>Sender Bank Note:</strong> {order.senderDetails}
+                        <Building size={16} style={{ flexShrink: 0 }} />
+                        <span>
+                          Direct Bank Transfer sent to <strong>Zenith Bank (Acc: 1014892014)</strong>. Once administrative review is complete, your books will be automatically available for download.
+                        </span>
                       </div>
-                    )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
-                    {/* Ordered Publications */}
-                    <div style={{ marginBottom: "1.25rem" }}>
-                      <div style={{ fontSize: "0.82rem", fontWeight: "700", color: "#475569", marginBottom: "0.4rem" }}>
-                        Ordered Publications ({order.items.length}):
-                      </div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                        {order.items.map((item, idx) => (
-                          <div
-                            key={idx}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 2: PURCHASED BOOKS & RESOURCES (User View)                */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "purchased-books" && (
+            <div>
+              <div
+                style={{
+                  marginBottom: "1.75rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
+                  flexWrap: "wrap",
+                  gap: "1rem",
+                }}
+              >
+                <div>
+                  <h2 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
+                    My Purchased Books &amp; Resources
+                  </h2>
+                  <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
+                    Access published literature, pastoral guides, and spiritual hymnbooks by Ven. Victor Akpevwen Onosemuode (Rtd.).
+                  </p>
+                </div>
+                <Link
+                  href="/books"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    color: "var(--rust, #a64b32)",
+                    fontSize: "0.9rem",
+                    fontWeight: "750",
+                    textDecoration: "none",
+                  }}
+                >
+                  Public Book Catalog <ExternalLink size={15} />
+                </Link>
+              </div>
+
+              {purchasedBooksList.length === 0 ? (
+                <div
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "14px",
+                    padding: "4rem 1.5rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <Library size={48} color="#94a3b8" style={{ margin: "0 auto 1.25rem", opacity: 0.6 }} />
+                  <h3 style={{ fontSize: "1.2rem", fontWeight: "700", color: "#0f172a", margin: "0 0 0.4rem" }}>
+                    You have not purchased any books yet
+                  </h3>
+                  <p style={{ color: "#64748b", fontSize: "0.92rem", maxWidth: "440px", margin: "0 auto 1.75rem", lineHeight: "1.6" }}>
+                    Explore the five legacy books written by Ven. Victor Akpevwen Onosemuode (Rtd.) to nurture faith, Anglican worship, and pastoral administration.
+                  </p>
+                  <Link
+                    href="/books"
+                    className="button button-rust"
+                    style={{ minHeight: "44px", padding: "0 1.5rem", fontSize: "0.88rem" }}
+                  >
+                    Browse Books Catalog
+                  </Link>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                    gap: "1.5rem",
+                  }}
+                >
+                  {purchasedBooksList.map((book) => (
+                    <div
+                      key={book._id || book.title}
+                      style={{
+                        background: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "14px",
+                        padding: "1.5rem",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
+                        gap: "1.25rem",
+                      }}
+                    >
+                      <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
+                        <div
+                          style={{
+                            position: "relative",
+                            width: "85px",
+                            height: "115px",
+                            background: "radial-gradient(circle, #f8f7f1 0%, #ebe7dc 100%)",
+                            borderRadius: "8px",
+                            overflow: "hidden",
+                            flexShrink: 0,
+                            border: "1px solid #e2e8f0",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Image
+                            src={book.coverImage || "/annual-vestry-meeting-poster.png"}
+                            alt={book.title}
+                            fill
+                            sizes="100px"
+                            style={{ objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.18))" }}
+                          />
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <span
                             style={{
-                              background: "#ffffff",
-                              border: "1px solid #cbd5e1",
-                              borderRadius: "6px",
-                              padding: "0.35rem 0.75rem",
-                              fontSize: "0.82rem",
-                              fontWeight: "600",
-                              color: "#1e293b",
+                              fontSize: "0.72rem",
+                              fontWeight: "750",
+                              textTransform: "uppercase",
+                              padding: "0.15rem 0.5rem",
+                              borderRadius: "4px",
+                              background: "#f1f5f9",
+                              color: "#475569",
+                              display: "inline-block",
+                              marginBottom: "0.35rem",
                             }}
                           >
-                            {item.quantity}x {item.title}
+                            {book.category || "Christian Literature"}
+                          </span>
+                          <h3
+                            style={{
+                              margin: "0 0 0.35rem",
+                              fontSize: "1.05rem",
+                              fontFamily: "Georgia, serif",
+                              lineHeight: "1.3",
+                              color: "var(--ink, #173a32)",
+                            }}
+                          >
+                            {book.title}
+                          </h3>
+                          <div
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem",
+                              fontSize: "0.75rem",
+                              fontWeight: "750",
+                              color: "#16a34a",
+                              background: "#dcfce7",
+                              padding: "0.15rem 0.55rem",
+                              borderRadius: "999px",
+                            }}
+                          >
+                            <CheckCircle size={12} /> Unlocked
+                          </div>
+                        </div>
+                      </div>
+
+                      <p style={{ margin: 0, fontSize: "0.85rem", color: "#64748b", lineHeight: "1.5" }}>
+                        {book.note}
+                      </p>
+
+                      <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <a
+                          href={book.coverImage || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="button button-rust"
+                          style={{
+                            flex: 1,
+                            minHeight: "38px",
+                            padding: "0 0.75rem",
+                            fontSize: "0.78rem",
+                            borderRadius: "6px",
+                          }}
+                        >
+                          <Download size={14} /> Download Study Guide
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 3: SCHEDULED EVENTS & CONSULTATIONS (User View)           */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "scheduled-events" && (
+            <div>
+              <div
+                style={{
+                  marginBottom: "1.75rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
+                  flexWrap: "wrap",
+                  gap: "1rem",
+                }}
+              >
+                <div>
+                  <h2 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
+                    My Scheduled Events &amp; Consultations
+                  </h2>
+                  <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
+                    Speaking engagements where you have reserved seats, plus any personal meetings scheduled with Ven. Victor Onosemuode (Rtd.).
+                  </p>
+                </div>
+                <div style={{ display: "flex", gap: "0.75rem" }}>
+                  <Link
+                    href="/events"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                      color: "var(--rust, #a64b32)",
+                      fontSize: "0.88rem",
+                      fontWeight: "750",
+                    }}
+                  >
+                    Speaking Events <ExternalLink size={14} />
+                  </Link>
+                  <Link
+                    href="/calendar"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                      color: "#1e3a8a",
+                      fontSize: "0.88rem",
+                      fontWeight: "750",
+                    }}
+                  >
+                    Calendar Booking <ExternalLink size={14} />
+                  </Link>
+                </div>
+              </div>
+
+              {reservations.length === 0 && meetings.length === 0 ? (
+                <div
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "14px",
+                    padding: "3.5rem 1.5rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <Calendar size={48} color="#94a3b8" style={{ margin: "0 auto 1.25rem", opacity: 0.6 }} />
+                  <h3 style={{ fontSize: "1.15rem", fontWeight: "700", color: "#0f172a", margin: "0 0 0.4rem" }}>
+                    No Scheduled Events or Meetings
+                  </h3>
+                  <p style={{ color: "#64748b", fontSize: "0.9rem", maxWidth: "420px", margin: "0 auto 1.5rem" }}>
+                    You have not booked any event seat reservations or scheduled consultations yet.
+                  </p>
+                  <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
+                    <Link
+                      href="/events"
+                      className="button button-rust"
+                      style={{ minHeight: "42px", padding: "0 1.25rem", fontSize: "0.85rem" }}
+                    >
+                      <Ticket size={14} /> Reserve Event Seat
+                    </Link>
+                    <Link
+                      href="/calendar"
+                      style={{
+                        padding: "0 1.25rem",
+                        borderRadius: "6px",
+                        border: "1px solid #cbd5e1",
+                        background: "#ffffff",
+                        color: "#334155",
+                        fontSize: "0.85rem",
+                        fontWeight: "600",
+                        display: "inline-flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      Book Meeting
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                  {/* Event Reservations */}
+                  {reservations.length > 0 && (
+                    <div>
+                      <h3 style={{ fontSize: "1.05rem", fontWeight: "700", color: "#334155", marginBottom: "0.75rem" }}>
+                        Speaking Event Reservations ({reservations.length})
+                      </h3>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem" }}>
+                        {reservations.map((res) => (
+                          <div
+                            key={res._id}
+                            style={{
+                              background: "#ffffff",
+                              border: "1px solid #e2e8f0",
+                              borderRadius: "12px",
+                              padding: "1.25rem",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                            }}
+                          >
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                              <span style={{ fontFamily: "monospace", fontSize: "0.82rem", fontWeight: "800", color: "var(--rust, #a64b32)" }}>
+                                {res.reservationCode}
+                              </span>
+                              <span style={{ fontSize: "0.72rem", fontWeight: "750", background: "#dcfce7", color: "#166534", padding: "2px 8px", borderRadius: "999px" }}>
+                                {res.seatsCount} {res.seatsCount === 1 ? "Seat" : "Seats"} Confirmed
+                              </span>
+                            </div>
+                            <h4 style={{ margin: "0 0 0.5rem", fontSize: "1rem", color: "var(--ink, #173a32)", fontFamily: "Georgia, serif" }}>
+                              {res.eventTitle}
+                            </h4>
+                            <div style={{ fontSize: "0.82rem", color: "#475569", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                              <div><Calendar size={13} style={{ display: "inline", marginRight: "4px" }} /> {res.eventDate}</div>
+                              <div><MapPin size={13} style={{ display: "inline", marginRight: "4px" }} /> {res.eventVenue}</div>
+                            </div>
                           </div>
                         ))}
                       </div>
                     </div>
+                  )}
 
-                    {/* Admin Action Buttons */}
-                    <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
-                      <button
-                        onClick={() => handleRejectPayment(order._id)}
-                        disabled={isApproving}
-                        style={{
-                          padding: "0.6rem 1rem",
-                          borderRadius: "6px",
-                          border: "1px solid #fecaca",
-                          background: "#ffffff",
-                          color: "#b91c1c",
-                          fontSize: "0.85rem",
-                          fontWeight: "650",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <XCircle size={15} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
-                        Reject
-                      </button>
-                      <button
-                        onClick={() => handleConfirmPayment(order._id)}
-                        disabled={isApproving}
-                        className="button"
-                        style={{
-                          background: "#166534",
-                          color: "#ffffff",
-                          minHeight: "40px",
-                          padding: "0 1.25rem",
-                          fontSize: "0.85rem",
-                          borderRadius: "6px",
-                        }}
-                      >
-                        {isApproving ? (
-                          <>
-                            <Loader2 size={16} className="animate-spin" /> Unlocking...
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle size={16} /> Confirm Payment &amp; Unlock Books
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 5: MANAGE POSTS (Admin & Manager)                          */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "posts" && (user.role === "admin" || user.role === "manager") && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem" }}>
-          {/* Post Creation Form */}
-          <div
-            style={{
-              background: "#ffffff",
-              border: "1px solid #e2e8f0",
-              borderRadius: "14px",
-              padding: "2rem",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
-            }}
-          >
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", marginBottom: "0.5rem" }}>
-              Publish New Ministry Post
-            </h2>
-            <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-              Compose and publish articles, sermons, or ministry announcements.
-            </p>
-
-            <form onSubmit={handleCreatePost} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
-                    Post Title
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Walking in Divine Wisdom and Integrity"
-                    value={postTitle}
-                    onChange={(e) => setPostTitle(e.target.value)}
-                    style={{ width: "100%", padding: "0.7rem 0.9rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
-                    Category
-                  </label>
-                  <select
-                    value={postCategory}
-                    onChange={(e) => setPostCategory(e.target.value)}
-                    style={{ width: "100%", padding: "0.7rem 0.9rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem", background: "#ffffff" }}
-                  >
-                    <option value="Ministry & Teachings">Ministry &amp; Teachings</option>
-                    <option value="Church Leadership">Church Leadership</option>
-                    <option value="Christian Living & Books">Christian Living &amp; Books</option>
-                    <option value="Community & Centenary">Community &amp; Centenary</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
-                  Short Summary / Excerpt
-                </label>
-                <input
-                  type="text"
-                  placeholder="A brief 1-2 sentence preview"
-                  value={postExcerpt}
-                  onChange={(e) => setPostExcerpt(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem 0.9rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
-                  Post Content
-                </label>
-                <textarea
-                  required
-                  rows={6}
-                  placeholder="Write the full message, scripture references, and reflection..."
-                  value={postContent}
-                  onChange={(e) => setPostContent(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem 0.9rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={posting}
-                className="button button-rust"
-                style={{ alignSelf: "flex-start", minHeight: "44px", padding: "0 1.5rem" }}
-              >
-                {posting ? "Publishing..." : "Publish Post"}
-              </button>
-            </form>
-          </div>
-
-          {/* Posts list */}
-          <div>
-            <h3 style={{ fontSize: "1.15rem", fontWeight: "700", marginBottom: "1rem" }}>
-              Existing Published Posts ({posts.length})
-            </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              {posts.map((p) => (
-                <div key={p._id} style={{ background: "#ffffff", padding: "1.25rem", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.3rem" }}>
-                    <h4 style={{ margin: 0, fontSize: "1.05rem", color: "#0f172a" }}>{p.title}</h4>
-                    <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{new Date(p.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <p style={{ margin: "0 0 0.5rem", fontSize: "0.88rem", color: "#475569" }}>{p.excerpt || p.content.slice(0, 140)}...</p>
-                  <span style={{ fontSize: "0.75rem", background: "#f1f5f9", padding: "2px 8px", borderRadius: "4px", color: "#475569" }}>
-                    {p.category}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 6: MANAGE BOOKS (Admin & Manager)                          */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "books" && (user.role === "admin" || user.role === "manager") && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          {/* Add Book Form */}
-          <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "2rem" }}>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", marginBottom: "0.5rem" }}>
-              Add Publication to Catalog
-            </h2>
-            <form onSubmit={handleCreateBook} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Title</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Book Title"
-                    value={newBookTitle}
-                    onChange={(e) => setNewBookTitle(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Price (NGN)</label>
-                  <input
-                    type="number"
-                    required
-                    value={newBookPrice}
-                    onChange={(e) => setNewBookPrice(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Description / Note</label>
-                <textarea
-                  rows={3}
-                  required
-                  placeholder="Summary of contents and significance..."
-                  value={newBookNote}
-                  onChange={(e) => setNewBookNote(e.target.value)}
-                  style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Category</label>
-                  <input
-                    type="text"
-                    value={newBookCategory}
-                    onChange={(e) => setNewBookCategory(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Author</label>
-                  <input
-                    type="text"
-                    value={newBookAuthor}
-                    onChange={(e) => setNewBookAuthor(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-              </div>
-
-              <button type="submit" disabled={savingBook} className="button button-rust" style={{ alignSelf: "flex-start", minHeight: "42px" }}>
-                {savingBook ? "Adding..." : "Add Book to Catalog"}
-              </button>
-            </form>
-          </div>
-
-          {/* Book Catalog list */}
-          <div>
-            <h3 style={{ fontSize: "1.15rem", fontWeight: "700", marginBottom: "1rem" }}>Catalog Books ({booksAdminList.length})</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" }}>
-              {booksAdminList.map((b) => (
-                <div key={b._id} style={{ background: "#ffffff", padding: "1rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                  <h4 style={{ margin: "0 0 0.3rem", fontSize: "0.95rem" }}>{b.title}</h4>
-                  <div style={{ color: "var(--rust, #a64b32)", fontWeight: "750", fontSize: "0.9rem" }}>{formatPrice(b.price)}</div>
-                  <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{b.category}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 7: USER DIRECTORY (Admin & Manager)                        */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "users" && (user.role === "admin" || user.role === "manager") && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          {/* Create User Form */}
-          <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "1.75rem" }}>
-            <h2 style={{ fontSize: "1.2rem", fontWeight: "750", marginBottom: "1rem" }}>Create New User Account</h2>
-            <form onSubmit={handleCreateUser} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
-              <input
-                type="email"
-                required
-                placeholder="User Email"
-                value={newUserEmail}
-                onChange={(e) => setNewUserEmail(e.target.value)}
-                style={{ padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-              />
-              <input
-                type="password"
-                required
-                placeholder="Password"
-                value={newUserPassword}
-                onChange={(e) => setNewUserPassword(e.target.value)}
-                style={{ padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-              />
-              <select
-                value={newUserRole}
-                onChange={(e) => setNewUserRole(e.target.value as "admin" | "manager" | "user")}
-                style={{ padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#ffffff" }}
-              >
-                <option value="user">User</option>
-                <option value="manager">Manager</option>
-                <option value="admin">Admin</option>
-              </select>
-              <button type="submit" disabled={creatingUser} className="button button-rust" style={{ minHeight: "42px" }}>
-                {creatingUser ? "Creating..." : "Create Account"}
-              </button>
-            </form>
-          </div>
-
-          {/* Users Table */}
-          <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden" }}>
-            <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid #e2e8f0", fontWeight: "700" }}>
-              Registered Users ({usersList.length})
-            </div>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc", textAlign: "left", color: "#64748b" }}>
-                    <th style={{ padding: "0.75rem 1.5rem" }}>Email</th>
-                    <th style={{ padding: "0.75rem 1.5rem" }}>Role</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {usersList.map((u) => (
-                    <tr key={u._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "0.75rem 1.5rem", fontWeight: "600" }}>{u.email}</td>
-                      <td style={{ padding: "0.75rem 1.5rem" }}>
-                        <span style={{ textTransform: "uppercase", fontSize: "0.72rem", fontWeight: "750", padding: "2px 8px", borderRadius: "999px", background: roleColors[u.role].bg, color: roleColors[u.role].text }}>
-                          {u.role}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 8: SCHEDULE & MEETINGS (Admin & Manager)                  */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "schedule" && (user.role === "admin" || user.role === "manager") && (() => {
-        const pendingMeetings = meetings.filter((m) => m.status === "pending");
-        const otherMeetings = meetings.filter((m) => m.status !== "pending");
-        return (
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
-              <div>
-                <h2 style={{ fontSize: "1.35rem", fontWeight: "750", margin: "0 0 0.25rem" }}>Meeting Requests &amp; Schedule</h2>
-                <p style={{ margin: 0, fontSize: "0.9rem", color: "#64748b" }}>Review, approve, or decline client consultation requests.</p>
-              </div>
-              <Link href="/calendar" className="button button-rust" style={{ minHeight: "40px", fontSize: "0.85rem" }}>
-                Open Full Calendar
-              </Link>
-            </div>
-
-            {/* Pending approvals */}
-            <div style={{ marginBottom: "2rem" }}>
-              <h3 style={{ fontSize: "1.05rem", fontWeight: "750", color: "#b45309", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ background: "#fef3c7", color: "#b45309", border: "1px solid #fcd34d", borderRadius: "999px", padding: "1px 10px", fontSize: "0.8rem", fontWeight: "800" }}>
-                  {pendingMeetings.length}
-                </span>
-                Pending Meeting Requests
-              </h3>
-              {pendingMeetings.length === 0 ? (
-                <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "2.5rem 1.5rem", textAlign: "center" }}>
-                  <CheckCircle2 size={38} color="#16a34a" style={{ margin: "0 auto 0.75rem", opacity: 0.8 }} />
-                  <p style={{ margin: 0, color: "#64748b", fontSize: "0.92rem" }}>No pending meeting requests at this time.</p>
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                  {pendingMeetings.map((m) => {
-                    const isActing = approvingMeetingId === m._id;
-                    return (
-                      <div
-                        key={m._id}
-                        style={{
-                          background: "#ffffff",
-                          border: "1.5px solid #fcd34d",
-                          borderRadius: "12px",
-                          padding: "1.25rem 1.5rem",
-                          boxShadow: "0 3px 10px rgba(0,0,0,0.04)",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
-                          <div style={{ flex: 1, minWidth: "200px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.35rem" }}>
-                              <span style={{ fontSize: "0.72rem", fontWeight: "800", background: "#fef3c7", color: "#b45309", padding: "2px 8px", borderRadius: "999px", textTransform: "uppercase" }}>
-                                Awaiting Approval
+                  {/* Consultation Meetings */}
+                  {meetings.length > 0 && (
+                    <div>
+                      <h3 style={{ fontSize: "1.05rem", fontWeight: "700", color: "#334155", marginBottom: "0.75rem" }}>
+                        Consultation Meetings ({meetings.length})
+                      </h3>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem" }}>
+                        {meetings.map((m) => (
+                          <div
+                            key={m._id}
+                            style={{
+                              background: "#ffffff",
+                              border: "1px solid #e2e8f0",
+                              borderRadius: "12px",
+                              padding: "1.25rem",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                            }}
+                          >
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                              <span style={{ fontSize: "0.75rem", fontWeight: "750", textTransform: "uppercase", color: "#1e3a8a" }}>
+                                Consultation
+                              </span>
+                              <span style={{ fontSize: "0.72rem", fontWeight: "750", background: "#e0e7ff", color: "#3730a3", padding: "2px 8px", borderRadius: "999px" }}>
+                                {m.status}
                               </span>
                             </div>
-                            <h4 style={{ margin: "0 0 0.4rem", fontSize: "1rem", color: "#0f172a" }}>{m.title}</h4>
-                            <div style={{ fontSize: "0.83rem", color: "#475569", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                              <div><strong>Client:</strong> {m.clientName || m.clientEmail || "Unknown"}</div>
-                              {m.clientEmail && <div style={{ color: "#94a3b8" }}>{m.clientEmail}</div>}
-                              <div><Clock size={13} style={{ display: "inline", marginRight: "4px" }} />
-                                {new Date(m.startTime).toLocaleString(undefined, {
-                                  weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
-                                })}
-                                <span style={{ marginLeft: "6px", color: "#94a3b8" }}>({m.duration} min)</span>
-                              </div>
-                              {m.location && <div><MapPin size={13} style={{ display: "inline", marginRight: "4px" }} />{m.location}</div>}
-                              {m.notes && <div style={{ fontStyle: "italic", color: "#94a3b8", marginTop: "0.2rem" }}>Note: {m.notes}</div>}
+                            <h4 style={{ margin: "0 0 0.4rem", fontSize: "1rem", color: "var(--ink, #173a32)" }}>
+                              {m.title}
+                            </h4>
+                            <div style={{ fontSize: "0.82rem", color: "#475569", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                              <div><Clock size={13} style={{ display: "inline", marginRight: "4px" }} /> {new Date(m.startTime).toLocaleString()}</div>
+                              {m.location && <div><MapPin size={13} style={{ display: "inline", marginRight: "4px" }} /> {m.location}</div>}
+                              {m.meetingUrl && <div><Video size={13} style={{ display: "inline", marginRight: "4px" }} /> <a href={m.meetingUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#1e3a8a", textDecoration: "underline" }}>Join Online Meeting</a></div>}
                             </div>
                           </div>
-                          <div style={{ display: "flex", gap: "0.6rem", alignItems: "center", flexShrink: 0 }}>
-                            <button
-                              onClick={() => handleApproveMeeting(m._id)}
-                              disabled={isActing}
-                              style={{
-                                padding: "0.5rem 1.1rem",
-                                borderRadius: "8px",
-                                border: "none",
-                                background: "#16a34a",
-                                color: "#ffffff",
-                                fontSize: "0.85rem",
-                                fontWeight: "700",
-                                cursor: isActing ? "not-allowed" : "pointer",
-                                opacity: isActing ? 0.7 : 1,
-                              }}
-                            >
-                              {isActing ? "..." : "✓ Approve"}
-                            </button>
-                            <button
-                              onClick={() => handleRejectMeeting(m._id)}
-                              disabled={isActing}
-                              style={{
-                                padding: "0.5rem 1.1rem",
-                                borderRadius: "8px",
-                                border: "1px solid #fca5a5",
-                                background: "#fff1f2",
-                                color: "#dc2626",
-                                fontSize: "0.85rem",
-                                fontWeight: "700",
-                                cursor: isActing ? "not-allowed" : "pointer",
-                                opacity: isActing ? 0.7 : 1,
-                              }}
-                            >
-                              ✕ Decline
-                            </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 4: PAYMENT APPROVALS (Admin & Manager View)               */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "approvals" && (user.role === "admin" || user.role === "manager") && (
+            <div>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <h2 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
+                  Bank Transfer Payment Approvals
+                </h2>
+                <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
+                  Review customer payment transfers sent to Zenith Bank. Confirming an order immediately unlocks the books in that user&apos;s account.
+                </p>
+              </div>
+
+              {pendingOrders.length === 0 ? (
+                <div
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "14px",
+                    padding: "3.5rem 1.5rem",
+                    textAlign: "center",
+                  }}
+                >
+                  <CheckCircle2 size={46} color="#16a34a" style={{ margin: "0 auto 1rem", opacity: 0.8 }} />
+                  <h3 style={{ fontSize: "1.15rem", fontWeight: "700", color: "#0f172a", margin: "0 0 0.4rem" }}>
+                    All Payments Cleared!
+                  </h3>
+                  <p style={{ color: "#64748b", fontSize: "0.9rem" }}>
+                    There are no pending bank transfers awaiting review at this time.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                  {pendingOrders.map((order) => {
+                    const isApproving = approvingOrderId === order._id;
+                    const addr = order.deliveryAddress;
+                    const fullAddressString = [
+                      addr?.street,
+                      addr?.city,
+                      addr?.state,
+                      addr?.postalCode,
+                      addr?.country,
+                    ]
+                      .filter(Boolean)
+                      .join(", ");
+
+                    return (
+                      <div
+                        key={order._id}
+                        style={{
+                          background: "#ffffff",
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "14px",
+                          padding: "1.5rem",
+                          boxShadow: "0 4px 14px rgba(0,0,0,0.03)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            flexWrap: "wrap",
+                            gap: "1rem",
+                            marginBottom: "1rem",
+                            paddingBottom: "1rem",
+                            borderBottom: "1px solid #f1f5f9",
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.3rem" }}>
+                              <span style={{ fontFamily: "monospace", fontSize: "1.15rem", fontWeight: "850", color: "var(--rust, #a64b32)" }}>
+                                {order.orderNumber}
+                              </span>
+                              <span style={{ fontSize: "0.72rem", fontWeight: "750", background: "#fef3c7", color: "#b45309", padding: "2px 8px", borderRadius: "999px" }}>
+                                Payment Submitted
+                              </span>
+                            </div>
+                            <div style={{ fontSize: "0.85rem", color: "#475569" }}>
+                              Customer: <strong>{order.customerName}</strong> ({order.customerEmail}) · Phone: {order.customerPhone || "N/A"}
+                            </div>
                           </div>
+                          <div style={{ textAlign: "right" }}>
+                            <div style={{ fontSize: "0.8rem", color: "#64748b" }}>Order Total</div>
+                            <div style={{ fontSize: "1.35rem", fontWeight: "850", color: "#166534" }}>
+                              {formatPrice(order.totalAmount)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 5-part Delivery Address breakdown */}
+                        <div
+                          style={{
+                            background: "#f8fafc",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "8px",
+                            padding: "0.85rem 1rem",
+                            fontSize: "0.85rem",
+                            color: "#334155",
+                            marginBottom: "1rem",
+                          }}
+                        >
+                          <div style={{ fontWeight: "750", marginBottom: "0.25rem", color: "#0f172a" }}>
+                            5-Part Delivery Address:
+                          </div>
+                          <div>{fullAddressString || "Address not provided"}</div>
+                        </div>
+
+                        {/* Sender payment note if provided */}
+                        {order.senderDetails && (
+                          <div
+                            style={{
+                              background: "#f0fdf4",
+                              border: "1px solid #bbf7d0",
+                              borderRadius: "8px",
+                              padding: "0.75rem 1rem",
+                              fontSize: "0.85rem",
+                              color: "#166534",
+                              marginBottom: "1rem",
+                            }}
+                          >
+                            <strong>Sender Bank Note:</strong> {order.senderDetails}
+                          </div>
+                        )}
+
+                        {/* Ordered Publications */}
+                        <div style={{ marginBottom: "1.25rem" }}>
+                          <div style={{ fontSize: "0.82rem", fontWeight: "700", color: "#475569", marginBottom: "0.4rem" }}>
+                            Ordered Publications ({order.items.length}):
+                          </div>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                            {order.items.map((item, idx) => (
+                              <div
+                                key={idx}
+                                style={{
+                                  background: "#ffffff",
+                                  border: "1px solid #cbd5e1",
+                                  borderRadius: "6px",
+                                  padding: "0.35rem 0.75rem",
+                                  fontSize: "0.82rem",
+                                  fontWeight: "600",
+                                  color: "#1e293b",
+                                }}
+                              >
+                                {item.quantity}x {item.title}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Admin Action Buttons */}
+                        <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+                          <button
+                            onClick={() => handleRejectPayment(order._id)}
+                            disabled={isApproving}
+                            style={{
+                              padding: "0.6rem 1rem",
+                              borderRadius: "6px",
+                              border: "1px solid #fecaca",
+                              background: "#ffffff",
+                              color: "#b91c1c",
+                              fontSize: "0.85rem",
+                              fontWeight: "650",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <XCircle size={15} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
+                            Reject
+                          </button>
+                          <button
+                            onClick={() => handleConfirmPayment(order._id)}
+                            disabled={isApproving}
+                            className="button"
+                            style={{
+                              background: "#166534",
+                              color: "#ffffff",
+                              minHeight: "40px",
+                              padding: "0 1.25rem",
+                              fontSize: "0.85rem",
+                              borderRadius: "6px",
+                            }}
+                          >
+                            {isApproving ? (
+                              <>
+                                <Loader2 size={16} className="animate-spin" /> Unlocking...
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle size={16} /> Confirm Payment &amp; Unlock Books
+                              </>
+                            )}
+                          </button>
                         </div>
                       </div>
                     );
@@ -2136,319 +1806,709 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
+          )}
 
-            {/* All other meetings */}
-            <div>
-              <h3 style={{ fontSize: "1.05rem", fontWeight: "750", color: "#0f172a", marginBottom: "1rem" }}>
-                All Meetings ({otherMeetings.length})
-              </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                {otherMeetings.length === 0 ? (
-                  <p style={{ color: "#64748b", textAlign: "center", padding: "2rem 0" }}>No confirmed meetings found.</p>
-                ) : otherMeetings.map((m) => (
-                  <div key={m._id} style={{ background: "#ffffff", padding: "1.1rem 1.25rem", borderRadius: "10px", border: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 5: MANAGE POSTS (Admin & Manager)                          */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "posts" && (user.role === "admin" || user.role === "manager") && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem" }}>
+              {/* Post Creation Form */}
+              <div
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "14px",
+                  padding: "2rem",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
+                }}
+              >
+                <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", marginBottom: "0.5rem" }}>
+                  Publish New Ministry Post
+                </h2>
+                <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+                  Compose and publish articles, sermons, or ministry announcements.
+                </p>
+
+                <form onSubmit={handleCreatePost} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
                     <div>
-                      <h4 style={{ margin: "0 0 0.25rem", fontSize: "0.97rem" }}>{m.title}</h4>
-                      <div style={{ fontSize: "0.83rem", color: "#64748b" }}>
-                        {m.clientName || m.clientEmail} · {new Date(m.startTime).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                      </div>
-                    </div>
-                    <span style={{
-                      textTransform: "capitalize",
-                      fontSize: "0.76rem",
-                      fontWeight: "750",
-                      padding: "3px 10px",
-                      borderRadius: "6px",
-                      background: m.status === "scheduled" ? "#dcfce7" : m.status === "cancelled" ? "#fee2e2" : "#f1f5f9",
-                      color: m.status === "scheduled" ? "#15803d" : m.status === "cancelled" ? "#b91c1c" : "#475569",
-                    }}>
-                      {m.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* TAB 9: SPEAKING EVENTS (Admin & Manager)                      */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {activeTab === "events" && (user.role === "admin" || user.role === "manager") && (
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
-            <div>
-              <h2 style={{ fontSize: "1.35rem", fontWeight: "750", margin: "0 0 0.25rem" }}>
-                Speaking Events & Synods Management
-              </h2>
-              <p style={{ margin: 0, fontSize: "0.9rem", color: "#64748b" }}>
-                Create and manage speaking engagements, synods, and church lectures with 50% poster visuals and seat reservations.
-              </p>
-            </div>
-            <Link href="/events" className="button button-rust" style={{ minHeight: "40px", fontSize: "0.85rem" }}>
-              View Public Events Page
-            </Link>
-          </div>
-
-          {/* Create Event Card */}
-          <div
-            style={{
-              background: "#ffffff",
-              border: "1px solid #e2e8f0",
-              borderRadius: "14px",
-              padding: "1.75rem",
-              marginBottom: "2rem",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
-            }}
-          >
-            <h3 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "1.25rem", color: "var(--ink, #173a32)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-              <PlusCircle size={18} style={{ color: "var(--rust)" }} /> Add New Speaking Event
-            </h3>
-
-            <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                    Event Title *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Anglican Diocesan Clergy & Laity Synod 2026"
-                    value={newEventTitle}
-                    onChange={(e) => setNewEventTitle(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                    Theme / Focus
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Anchored in Christ: Sustaining Pastoral Ministry"
-                    value={newEventTheme}
-                    onChange={(e) => setNewEventTheme(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                    Date *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. October 14–16, 2026 or 2026-10-14"
-                    value={newEventDate}
-                    onChange={(e) => setNewEventDate(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                    Time
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 10:00 AM WAT"
-                    value={newEventTime}
-                    onChange={(e) => setNewEventTime(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                    Category
-                  </label>
-                  <select
-                    value={newEventCategory}
-                    onChange={(e) => setNewEventCategory(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#ffffff" }}
-                  >
-                    <option value="Synod">Synod</option>
-                    <option value="Hymnology">Hymnology</option>
-                    <option value="Youth Convention">Youth Convention</option>
-                    <option value="Colloquium">Colloquium</option>
-                    <option value="Special Service">Special Service</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                    Venue *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Cathedral Church of St. Andrew, Warri"
-                    value={newEventVenue}
-                    onChange={(e) => setNewEventVenue(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                    Speaker Role
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Keynote Speaker & Pastoral Mentor"
-                    value={newEventRole}
-                    onChange={(e) => setNewEventRole(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                    Seat Capacity
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    placeholder="200"
-                    value={newEventCapacity}
-                    onChange={(e) => setNewEventCapacity(e.target.value)}
-                    style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                  Poster Image Preset
-                </label>
-                <select
-                  value={newEventPoster}
-                  onChange={(e) => setNewEventPoster(e.target.value)}
-                  style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#ffffff" }}
-                >
-                  <option value="/annual-vestry-meeting-poster.png">Annual Vestry Meeting Poster</option>
-                  <option value="/the-hymnfinder-poster.png">The Hymnfinder Poster</option>
-                  <option value="/youth-children-hymn-book-poster.png">Youth & Children Hymn Book Poster</option>
-                  <option value="/my-patmos-poster.png">My Patmos Devotional Poster</option>
-                  <option value="/historical-encounter-poster.webp">Historical Encounter Poster</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                  Description & Details
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Provide background, attendee instructions, or topics covered..."
-                  value={newEventDesc}
-                  onChange={(e) => setNewEventDesc(e.target.value)}
-                  style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <button
-                  type="submit"
-                  disabled={creatingEvent}
-                  className="button button-rust"
-                  style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", minHeight: "42px" }}
-                >
-                  {creatingEvent && <Loader2 size={16} className="animate-spin" />}
-                  Publish Speaking Event
-                </button>
-              </div>
-            </form>
-          </div>
-
-          {/* Events List */}
-          <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden" }}>
-            <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid #e2e8f0", fontWeight: "700", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span>Published Speaking Engagements ({eventsList.length})</span>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {eventsList.map((ev) => (
-                <div
-                  key={ev._id}
-                  style={{
-                    padding: "1.25rem 1.5rem",
-                    borderBottom: "1px solid #f1f5f9",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: "1rem",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                    <div style={{ position: "relative", width: "70px", height: "70px", borderRadius: "8px", overflow: "hidden", background: "#173a32", flexShrink: 0 }}>
-                      <Image
-                        src={ev.posterImage || "/annual-vestry-meeting-poster.png"}
-                        alt={ev.title}
-                        fill
-                        style={{ objectFit: "cover" }}
+                      <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                        Post Title
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Walking in Divine Wisdom and Integrity"
+                        value={postTitle}
+                        onChange={(e) => setPostTitle(e.target.value)}
+                        style={{ width: "100%", padding: "0.7rem 0.9rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
                       />
                     </div>
                     <div>
-                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.2rem" }}>
-                        <span style={{ fontSize: "0.72rem", fontWeight: "800", textTransform: "uppercase", background: "#fef3c7", color: "#92400e", padding: "1px 6px", borderRadius: "4px" }}>
-                          {ev.category || "Event"}
-                        </span>
-                        <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
-                          {ev.date} • {ev.time}
-                        </span>
-                      </div>
-                      <h4 style={{ margin: "0 0 0.2rem", fontSize: "1.05rem", color: "#0f172a" }}>
-                        {ev.title}
-                      </h4>
-                      <p style={{ margin: 0, fontSize: "0.82rem", color: "#64748b" }}>
-                        📍 {ev.venue} • Role: <strong>{ev.clientRole || "Speaker"}</strong>
-                      </p>
+                      <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                        Category
+                      </label>
+                      <select
+                        value={postCategory}
+                        onChange={(e) => setPostCategory(e.target.value)}
+                        style={{ width: "100%", padding: "0.7rem 0.9rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem", background: "#ffffff" }}
+                      >
+                        <option value="Ministry & Teachings">Ministry &amp; Teachings</option>
+                        <option value="Church Leadership">Church Leadership</option>
+                        <option value="Christian Living & Books">Christian Living &amp; Books</option>
+                        <option value="Community & Centenary">Community &amp; Centenary</option>
+                      </select>
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: "0.85rem", fontWeight: "750", color: "#166534" }}>
-                        {ev.reservedSeats || 0} / {ev.capacity || 200}
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                      Short Summary / Excerpt
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="A brief 1-2 sentence preview"
+                      value={postExcerpt}
+                      onChange={(e) => setPostExcerpt(e.target.value)}
+                      style={{ width: "100%", padding: "0.7rem 0.9rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
+                      Post Content
+                    </label>
+                    <textarea
+                      required
+                      rows={6}
+                      placeholder="Write the full message, scripture references, and reflection..."
+                      value={postContent}
+                      onChange={(e) => setPostContent(e.target.value)}
+                      style={{ width: "100%", padding: "0.7rem 0.9rem", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={posting}
+                    className="button button-rust"
+                    style={{ alignSelf: "flex-start", minHeight: "44px", padding: "0 1.5rem" }}
+                  >
+                    {posting ? "Publishing..." : "Publish Post"}
+                  </button>
+                </form>
+              </div>
+
+              {/* Posts list */}
+              <div>
+                <h3 style={{ fontSize: "1.15rem", fontWeight: "700", marginBottom: "1rem" }}>
+                  Existing Published Posts ({posts.length})
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  {posts.map((p) => (
+                    <div key={p._id} style={{ background: "#ffffff", padding: "1.25rem", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.3rem" }}>
+                        <h4 style={{ margin: 0, fontSize: "1.05rem", color: "#0f172a" }}>{p.title}</h4>
+                        <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{new Date(p.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <div style={{ fontSize: "0.72rem", color: "#64748b" }}>Seats Reserved</div>
+                      <p style={{ margin: "0 0 0.5rem", fontSize: "0.88rem", color: "#475569" }}>{p.excerpt || p.content.slice(0, 140)}...</p>
+                      <span style={{ fontSize: "0.75rem", background: "#f1f5f9", padding: "2px 8px", borderRadius: "4px", color: "#475569" }}>
+                        {p.category}
+                      </span>
                     </div>
-                    <button
-                      onClick={() => handleDeleteEvent(ev._id, ev.title)}
-                      style={{
-                        background: "#fee2e2",
-                        color: "#b91c1c",
-                        border: "1px solid #fca5a5",
-                        borderRadius: "8px",
-                        padding: "0.45rem 0.8rem",
-                        fontSize: "0.8rem",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.3rem",
-                      }}
-                    >
-                      <Trash2 size={14} /> Delete
-                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 6: MANAGE BOOKS (Admin & Manager)                          */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "books" && (user.role === "admin" || user.role === "manager") && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              {/* Add Book Form */}
+              <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "2rem" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", marginBottom: "0.5rem" }}>
+                  Add Publication to Catalog
+                </h2>
+                <form onSubmit={handleCreateBook} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Title</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Book Title"
+                        value={newBookTitle}
+                        onChange={(e) => setNewBookTitle(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Price (NGN)</label>
+                      <input
+                        type="number"
+                        required
+                        value={newBookPrice}
+                        onChange={(e) => setNewBookPrice(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Description / Note</label>
+                    <textarea
+                      rows={3}
+                      required
+                      placeholder="Summary of contents and significance..."
+                      value={newBookNote}
+                      onChange={(e) => setNewBookNote(e.target.value)}
+                      style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                    />
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Category</label>
+                      <input
+                        type="text"
+                        value={newBookCategory}
+                        onChange={(e) => setNewBookCategory(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "0.3rem" }}>Author</label>
+                      <input
+                        type="text"
+                        value={newBookAuthor}
+                        onChange={(e) => setNewBookAuthor(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+                  </div>
+
+                  <button type="submit" disabled={savingBook} className="button button-rust" style={{ alignSelf: "flex-start", minHeight: "42px" }}>
+                    {savingBook ? "Adding..." : "Add Book to Catalog"}
+                  </button>
+                </form>
+              </div>
+
+              {/* Book Catalog list */}
+              <div>
+                <h3 style={{ fontSize: "1.15rem", fontWeight: "700", marginBottom: "1rem" }}>Catalog Books ({booksAdminList.length})</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" }}>
+                  {booksAdminList.map((b) => (
+                    <div key={b._id} style={{ background: "#ffffff", padding: "1rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                      <h4 style={{ margin: "0 0 0.3rem", fontSize: "0.95rem" }}>{b.title}</h4>
+                      <div style={{ color: "var(--rust, #a64b32)", fontWeight: "750", fontSize: "0.9rem" }}>{formatPrice(b.price)}</div>
+                      <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{b.category}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 7: USER DIRECTORY (Admin & Manager)                        */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "users" && (user.role === "admin" || user.role === "manager") && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              {/* Create User Form */}
+              <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "1.75rem" }}>
+                <h2 style={{ fontSize: "1.2rem", fontWeight: "750", marginBottom: "1rem" }}>Create New User Account</h2>
+                <form onSubmit={handleCreateUser} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
+                  <input
+                    type="email"
+                    required
+                    placeholder="User Email"
+                    value={newUserEmail}
+                    onChange={(e) => setNewUserEmail(e.target.value)}
+                    style={{ padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                  />
+                  <input
+                    type="password"
+                    required
+                    placeholder="Password"
+                    value={newUserPassword}
+                    onChange={(e) => setNewUserPassword(e.target.value)}
+                    style={{ padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                  />
+                  <select
+                    value={newUserRole}
+                    onChange={(e) => setNewUserRole(e.target.value as "admin" | "manager" | "user")}
+                    style={{ padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#ffffff" }}
+                  >
+                    <option value="user">User</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <button type="submit" disabled={creatingUser} className="button button-rust" style={{ minHeight: "42px" }}>
+                    {creatingUser ? "Creating..." : "Create Account"}
+                  </button>
+                </form>
+              </div>
+
+              {/* Users Table */}
+              <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden" }}>
+                <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid #e2e8f0", fontWeight: "700" }}>
+                  Registered Users ({usersList.length})
+                </div>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+                    <thead>
+                      <tr style={{ background: "#f8fafc", textAlign: "left", color: "#64748b" }}>
+                        <th style={{ padding: "0.75rem 1.5rem" }}>Email</th>
+                        <th style={{ padding: "0.75rem 1.5rem" }}>Role</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {usersList.map((u) => (
+                        <tr key={u._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                          <td style={{ padding: "0.75rem 1.5rem", fontWeight: "600" }}>{u.email}</td>
+                          <td style={{ padding: "0.75rem 1.5rem" }}>
+                            <span style={{ textTransform: "uppercase", fontSize: "0.72rem", fontWeight: "750", padding: "2px 8px", borderRadius: "999px", background: roleColors[u.role].bg, color: roleColors[u.role].text }}>
+                              {u.role}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 8: SCHEDULE & MEETINGS (Admin & Manager)                  */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "schedule" && (user.role === "admin" || user.role === "manager") && (() => {
+            const pendingMeetings = meetings.filter((m) => m.status === "pending");
+            const otherMeetings = meetings.filter((m) => m.status !== "pending");
+            return (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
+                  <div>
+                    <h2 style={{ fontSize: "1.35rem", fontWeight: "750", margin: "0 0 0.25rem" }}>Meeting Requests &amp; Schedule</h2>
+                    <p style={{ margin: 0, fontSize: "0.9rem", color: "#64748b" }}>Review, approve, or decline client consultation requests.</p>
+                  </div>
+                  <Link href="/calendar" className="button button-rust" style={{ minHeight: "40px", fontSize: "0.85rem" }}>
+                    Open Full Calendar
+                  </Link>
+                </div>
+
+                {/* Pending approvals */}
+                <div style={{ marginBottom: "2rem" }}>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: "750", color: "#b45309", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span style={{ background: "#fef3c7", color: "#b45309", border: "1px solid #fcd34d", borderRadius: "999px", padding: "1px 10px", fontSize: "0.8rem", fontWeight: "800" }}>
+                      {pendingMeetings.length}
+                    </span>
+                    Pending Meeting Requests
+                  </h3>
+                  {pendingMeetings.length === 0 ? (
+                    <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "2.5rem 1.5rem", textAlign: "center" }}>
+                      <CheckCircle2 size={38} color="#16a34a" style={{ margin: "0 auto 0.75rem", opacity: 0.8 }} />
+                      <p style={{ margin: 0, color: "#64748b", fontSize: "0.92rem" }}>No pending meeting requests at this time.</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                      {pendingMeetings.map((m) => {
+                        const isActing = approvingMeetingId === m._id;
+                        return (
+                          <div
+                            key={m._id}
+                            style={{
+                              background: "#ffffff",
+                              border: "1.5px solid #fcd34d",
+                              borderRadius: "12px",
+                              padding: "1.25rem 1.5rem",
+                              boxShadow: "0 3px 10px rgba(0,0,0,0.04)",
+                            }}
+                          >
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
+                              <div style={{ flex: 1, minWidth: "200px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.35rem" }}>
+                                  <span style={{ fontSize: "0.72rem", fontWeight: "800", background: "#fef3c7", color: "#b45309", padding: "2px 8px", borderRadius: "999px", textTransform: "uppercase" }}>
+                                    Awaiting Approval
+                                  </span>
+                                </div>
+                                <h4 style={{ margin: "0 0 0.4rem", fontSize: "1rem", color: "#0f172a" }}>{m.title}</h4>
+                                <div style={{ fontSize: "0.83rem", color: "#475569", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                                  <div><strong>Client:</strong> {m.clientName || m.clientEmail || "Unknown"}</div>
+                                  {m.clientEmail && <div style={{ color: "#94a3b8" }}>{m.clientEmail}</div>}
+                                  <div><Clock size={13} style={{ display: "inline", marginRight: "4px" }} />
+                                    {new Date(m.startTime).toLocaleString(undefined, {
+                                      weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+                                    })}
+                                    <span style={{ marginLeft: "6px", color: "#94a3b8" }}>({m.duration} min)</span>
+                                  </div>
+                                  {m.location && <div><MapPin size={13} style={{ display: "inline", marginRight: "4px" }} />{m.location}</div>}
+                                  {m.notes && <div style={{ fontStyle: "italic", color: "#94a3b8", marginTop: "0.2rem" }}>Note: {m.notes}</div>}
+                                </div>
+                              </div>
+                              <div style={{ display: "flex", gap: "0.6rem", alignItems: "center", flexShrink: 0 }}>
+                                <button
+                                  onClick={() => handleApproveMeeting(m._id)}
+                                  disabled={isActing}
+                                  style={{
+                                    padding: "0.5rem 1.1rem",
+                                    borderRadius: "8px",
+                                    border: "none",
+                                    background: "#16a34a",
+                                    color: "#ffffff",
+                                    fontSize: "0.85rem",
+                                    fontWeight: "700",
+                                    cursor: isActing ? "not-allowed" : "pointer",
+                                    opacity: isActing ? 0.7 : 1,
+                                  }}
+                                >
+                                  {isActing ? "..." : "✓ Approve"}
+                                </button>
+                                <button
+                                  onClick={() => handleRejectMeeting(m._id)}
+                                  disabled={isActing}
+                                  style={{
+                                    padding: "0.5rem 1.1rem",
+                                    borderRadius: "8px",
+                                    border: "1px solid #fca5a5",
+                                    background: "#fff1f2",
+                                    color: "#dc2626",
+                                    fontSize: "0.85rem",
+                                    fontWeight: "700",
+                                    cursor: isActing ? "not-allowed" : "pointer",
+                                    opacity: isActing ? 0.7 : 1,
+                                  }}
+                                >
+                                  ✕ Decline
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* All other meetings */}
+                <div>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: "750", color: "#0f172a", marginBottom: "1rem" }}>
+                    All Meetings ({otherMeetings.length})
+                  </h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+                    {otherMeetings.length === 0 ? (
+                      <p style={{ color: "#64748b", textAlign: "center", padding: "2rem 0" }}>No confirmed meetings found.</p>
+                    ) : otherMeetings.map((m) => (
+                      <div key={m._id} style={{ background: "#ffffff", padding: "1.1rem 1.25rem", borderRadius: "10px", border: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
+                        <div>
+                          <h4 style={{ margin: "0 0 0.25rem", fontSize: "0.97rem" }}>{m.title}</h4>
+                          <div style={{ fontSize: "0.83rem", color: "#64748b" }}>
+                            {m.clientName || m.clientEmail} · {new Date(m.startTime).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </div>
+                        </div>
+                        <span style={{
+                          textTransform: "capitalize",
+                          fontSize: "0.76rem",
+                          fontWeight: "750",
+                          padding: "3px 10px",
+                          borderRadius: "6px",
+                          background: m.status === "scheduled" ? "#dcfce7" : m.status === "cancelled" ? "#fee2e2" : "#f1f5f9",
+                          color: m.status === "scheduled" ? "#15803d" : m.status === "cancelled" ? "#b91c1c" : "#475569",
+                        }}>
+                          {m.status}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              </div>
+            );
+          })()}
+
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB 9: SPEAKING EVENTS (Admin & Manager)                      */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "events" && (user.role === "admin" || user.role === "manager") && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
+                <div>
+                  <h2 style={{ fontSize: "1.35rem", fontWeight: "750", margin: "0 0 0.25rem" }}>
+                    Speaking Events & Synods Management
+                  </h2>
+                  <p style={{ margin: 0, fontSize: "0.9rem", color: "#64748b" }}>
+                    Create and manage speaking engagements, synods, and church lectures with 50% poster visuals and seat reservations.
+                  </p>
+                </div>
+                <Link href="/events" className="button button-rust" style={{ minHeight: "40px", fontSize: "0.85rem" }}>
+                  View Public Events Page
+                </Link>
+              </div>
+
+              {/* Create Event Card */}
+              <div
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "14px",
+                  padding: "1.75rem",
+                  marginBottom: "2rem",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
+                }}
+              >
+                <h3 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "1.25rem", color: "var(--ink, #173a32)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  <PlusCircle size={18} style={{ color: "var(--rust)" }} /> Add New Speaking Event
+                </h3>
+
+                <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1rem" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                        Event Title *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Anglican Diocesan Clergy & Laity Synod 2026"
+                        value={newEventTitle}
+                        onChange={(e) => setNewEventTitle(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                        Theme / Focus
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Anchored in Christ: Sustaining Pastoral Ministry"
+                        value={newEventTheme}
+                        onChange={(e) => setNewEventTheme(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                        Date *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. October 14–16, 2026 or 2026-10-14"
+                        value={newEventDate}
+                        onChange={(e) => setNewEventDate(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                        Time
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 10:00 AM WAT"
+                        value={newEventTime}
+                        onChange={(e) => setNewEventTime(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                        Category
+                      </label>
+                      <select
+                        value={newEventCategory}
+                        onChange={(e) => setNewEventCategory(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#ffffff" }}
+                      >
+                        <option value="Synod">Synod</option>
+                        <option value="Hymnology">Hymnology</option>
+                        <option value="Youth Convention">Youth Convention</option>
+                        <option value="Colloquium">Colloquium</option>
+                        <option value="Special Service">Special Service</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                        Venue *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Cathedral Church of St. Andrew, Warri"
+                        value={newEventVenue}
+                        onChange={(e) => setNewEventVenue(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                        Speaker Role
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Keynote Speaker & Pastoral Mentor"
+                        value={newEventRole}
+                        onChange={(e) => setNewEventRole(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                        Seat Capacity
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="200"
+                        value={newEventCapacity}
+                        onChange={(e) => setNewEventCapacity(e.target.value)}
+                        style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                      Poster Image Preset
+                    </label>
+                    <select
+                      value={newEventPoster}
+                      onChange={(e) => setNewEventPoster(e.target.value)}
+                      style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#ffffff" }}
+                    >
+                      <option value="/annual-vestry-meeting-poster.png">Annual Vestry Meeting Poster</option>
+                      <option value="/the-hymnfinder-poster.png">The Hymnfinder Poster</option>
+                      <option value="/youth-children-hymn-book-poster.png">Youth & Children Hymn Book Poster</option>
+                      <option value="/my-patmos-poster.png">My Patmos Devotional Poster</option>
+                      <option value="/historical-encounter-poster.webp">Historical Encounter Poster</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
+                      Description & Details
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder="Provide background, attendee instructions, or topics covered..."
+                      value={newEventDesc}
+                      onChange={(e) => setNewEventDesc(e.target.value)}
+                      style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <button
+                      type="submit"
+                      disabled={creatingEvent}
+                      className="button button-rust"
+                      style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", minHeight: "42px" }}
+                    >
+                      {creatingEvent && <Loader2 size={16} className="animate-spin" />}
+                      Publish Speaking Event
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Events List */}
+              <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden" }}>
+                <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid #e2e8f0", fontWeight: "700", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>Published Speaking Engagements ({eventsList.length})</span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {eventsList.map((ev) => (
+                    <div
+                      key={ev._id}
+                      style={{
+                        padding: "1.25rem 1.5rem",
+                        borderBottom: "1px solid #f1f5f9",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "1rem",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                        <div style={{ position: "relative", width: "70px", height: "70px", borderRadius: "8px", overflow: "hidden", background: "#173a32", flexShrink: 0 }}>
+                          <Image
+                            src={ev.posterImage || "/annual-vestry-meeting-poster.png"}
+                            alt={ev.title}
+                            fill
+                            style={{ objectFit: "cover" }}
+                          />
+                        </div>
+                        <div>
+                          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.2rem" }}>
+                            <span style={{ fontSize: "0.72rem", fontWeight: "800", textTransform: "uppercase", background: "#fef3c7", color: "#92400e", padding: "1px 6px", borderRadius: "4px" }}>
+                              {ev.category || "Event"}
+                            </span>
+                            <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                              {ev.date} • {ev.time}
+                            </span>
+                          </div>
+                          <h4 style={{ margin: "0 0 0.2rem", fontSize: "1.05rem", color: "#0f172a" }}>
+                            {ev.title}
+                          </h4>
+                          <p style={{ margin: 0, fontSize: "0.82rem", color: "#64748b" }}>
+                            📍 {ev.venue} • Role: <strong>{ev.clientRole || "Speaker"}</strong>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: "0.85rem", fontWeight: "750", color: "#166534" }}>
+                            {ev.reservedSeats || 0} / {ev.capacity || 200}
+                          </div>
+                          <div style={{ fontSize: "0.72rem", color: "#64748b" }}>Seats Reserved</div>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteEvent(ev._id, ev.title)}
+                          style={{
+                            background: "#fee2e2",
+                            color: "#b91c1c",
+                            border: "1px solid #fca5a5",
+                            borderRadius: "8px",
+                            padding: "0.45rem 0.8rem",
+                            fontSize: "0.8rem",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.3rem",
+                          }}
+                        >
+                          <Trash2 size={14} /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
+        </main>
+      </div>{/* end sidebar + content layout */}
     </div>
   );
 }
