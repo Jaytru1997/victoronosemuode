@@ -1,49 +1,50 @@
-# Ven. Victor Akpevwen Onosemuode
+# Ven. Victor Akpevwen Onosemuode (Rtd.)
 
-A profile and ministry website for Ven. Victor Akpevwen Onosemuode JP, Anglican priest, teacher, author, counsellor, and mentor from Arhavwarien, Delta State, Nigeria.
+The official website of **Venerable Victor Akpevwen Onosemuode JP (Rtd.)** — Anglican priest, teacher, author, counsellor, and pastoral mentor from Arhavwarien, Delta State, Nigeria.
 
-## Run locally
+## About the Website
 
-```bash
-npm install
-npm run dev
-```
+This is a personal ministry and profile website that celebrates the life, faith journey, and legacy of Ven. Victor Akpevwen Onosemuode. It serves as a digital home for his published works, speaking engagements, pastoral services, and community contributions.
 
-Open [http://localhost:3000](http://localhost:3000).
+## Pages
 
-## Site sections
+| Page | Purpose |
+|---|---|
+| **Home** `/` | Introduction to Ven. Victor, his books, ministry, and services |
+| **About** `/about` | Biography, faith journey, and life timeline |
+| **Books** `/books` | Five legacy publications available for purchase and download |
+| **Services** `/services` | Vestments, Christian books, counselling, and priestly mentorship |
+| **Ministry** `/ministry` | Ministry journey, church appointments, and pastoral work |
+| **Events** `/events` | Speaking engagements and event seat reservations |
+| **Community** `/community` | Community service and the St. Barnabas' centenary project |
+| **Contact** `/contact` | Locations, phone numbers, and email contact details |
+| **Calendar** `/calendar` | Consultation booking with Ven. Victor |
 
-- `/` introduces Victor, his books, ministry, and services.
-- `/about` shares his biography and life timeline.
-- `/resources` presents the five legacy books.
-- `/services` describes vestments, Christian books, counselling, and priestly mentorship.
-- `/ministry` covers his ministry journey and church appointments.
-- `/legacy` presents community impact, achievements, and recognition.
-- `/community` presents community service and the St. Barnabas’ centenary project.
-- `/contact` lists both locations, phone numbers, and email.
+## Features
 
-The supplied profile is the source of the biographical and contact content. Temporary images from the Sam Chand reference are collected in [`src/data/reference-images.ts`](src/data/reference-images.ts); replace those URLs with Victor’s image resources when available. Their alt text identifies them as temporary placeholders.
+- **Books Catalog** — Browse and purchase published works by Ven. Victor, covering Anglican worship, church administration, pastoral care, and Christian living.
+- **Member Portal** — Registered members can view their purchased books, track bank transfer payment status, and manage event reservations.
+- **Event Reservations** — Reserve seats for upcoming speaking engagements and synod events.
+- **Calendar Consultations** — Book personal meetings and pastoral consultations directly from the site.
+- **Administration Portal** — Admins and managers can approve payments, publish ministry posts, manage the books catalog, oversee user accounts, and schedule speaking events.
+- **Role-based Access** — Three access levels: *Admin*, *Manager*, and *Member*, each with appropriate permissions.
+- **Global Notifications** — Real-time toast notifications throughout the site for confirmations and alerts.
 
-## Validate
+## Technology
 
-```bash
-npm run lint
-npm run build
-```
+Built with **Next.js (TypeScript)**, vanilla CSS, MongoDB/Mongoose for data persistence, and JWT for session management.
 
-## Authentication & Authorization
+## Authentication & Roles
 
-This project uses **MongoDB** for persistence and **JWT** for authentication.
+| Role | Access |
+|---|---|
+| **Admin** | Full access — approvals, posts, catalog, users, events, meetings |
+| **Manager** | Can manage posts, catalog, and view approvals |
+| **User (Member)** | Can view purchased books, pending payments, and own reservations |
 
-### Roles
-- **Admin** – full access to all resources.
-- **Manager** – can create, edit, delete posts and manage users.
-- **User** – can view purchased items (books, resources).
+## Environment Variables
 
-### Required environment variables
 ```dotenv
 MONGODB_URI=your-mongodb-connection-string
 JWT_SECRET=your-jwt-secret
 ```
-
-See the `src/lib/mongodb.ts` and `src/models` directory for the connection logic and schema definitions.
