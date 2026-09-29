@@ -13,7 +13,7 @@ export interface SpeakingEvent {
   description: string;
   capacity: number;
   reservedSeats: number;
-  category: "Synod" | "Hymnology" | "Youth Convention" | "Colloquium" | "Special Service";
+  category: "Synod" | "Hymnology" | "Youth Convention" | "Colloquium" | "Special Service" | string;
   status: "upcoming" | "completed";
   posterImage?: string;
   createdAt?: Date;

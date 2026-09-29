@@ -121,6 +121,8 @@ interface MeetingItem {
   location?: string;
   meetingUrl?: string;
   status: string;
+  duration?: number;
+  notes?: string;
 }
 
 interface SpeakingEventAdminItem {
@@ -170,7 +172,7 @@ export default function DashboardPage() {
   const [newEventTime, setNewEventTime] = useState("10:00 AM WAT");
   const [newEventVenue, setNewEventVenue] = useState("");
   const [newEventLocation, setNewEventLocation] = useState("");
-  const [newEventRole, setNewEventRole] = useState("Keynote Speaker & Pastoral Mentor");
+  const [newEventRole, setNewEventRole] = useState("Attendee");
   const [newEventCapacity, setNewEventCapacity] = useState("200");
   const [newEventCategory, setNewEventCategory] = useState("Synod");
   const [newEventPoster, setNewEventPoster] = useState("/annual-vestry-meeting-poster.png");
@@ -373,7 +375,7 @@ export default function DashboardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create event");
-      success(`Speaking event "${newEventTitle}" added successfully!`, { title: "Event Created" });
+      success(`Event "${newEventTitle}" added successfully!`, { title: "Event Created" });
       setNewEventTitle("");
       setNewEventTheme("");
       setNewEventDate("");
@@ -613,149 +615,6 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
-      {/* Top Banner / User Header */}
-      <div style={{ padding: "1.5rem 2rem 0", maxWidth: "1400px", margin: "0 auto" }}>
-        <div
-          style={{
-            background: "#ffffff",
-            borderRadius: "16px",
-            border: "1px solid #e2e8f0",
-            padding: "1.75rem 2rem",
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "1.5rem",
-            marginBottom: "2rem",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
-            <Link href="/" title="Return to Website" style={{ display: "inline-flex", alignItems: "center" }}>
-              <Image
-                src="/logo.png"
-                alt="Ven. Victor Akpevwen Onosemuode (Rtd.) Logo"
-                width={160}
-                height={55}
-                style={{ objectFit: "contain", maxHeight: "44px", width: "auto" }}
-                priority
-              />
-            </Link>
-            <div style={{ width: "1px", height: "36px", background: "#e2e8f0" }} />
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-                <h1 style={{ fontSize: "1.35rem", fontWeight: "750", color: "#0f172a", margin: 0 }}>
-                  {user.role === "user" ? "Member Portal" : "Administration Portal"}
-                </h1>
-                <span
-                  style={{
-                    textTransform: "uppercase",
-                    fontSize: "0.72rem",
-                    fontWeight: "800",
-                    letterSpacing: "0.06em",
-                    padding: "0.2rem 0.65rem",
-                    borderRadius: "999px",
-                    backgroundColor: roleColors[user.role].bg,
-                    color: roleColors[user.role].text,
-                    border: `1px solid ${roleColors[user.role].border}`,
-                  }}
-                >
-                  {user.role}
-                </span>
-              </div>
-              {/* Prominent User Email identification */}
-              <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
-                Logged in as: <strong style={{ color: "#0f172a" }}>{user.email}</strong>
-              </p>
-            </div>
-          </div>
-
-          {/* User avatar area with subtle sign-out */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setShowUserMenu((v) => !v)}
-              title={user.email}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.6rem",
-                padding: "0.5rem 0.9rem",
-                borderRadius: "999px",
-                border: "1px solid #e2e8f0",
-                background: "#f8fafc",
-                color: "#334155",
-                fontSize: "0.85rem",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              <span
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  background: roleColors[user.role].bg,
-                  color: roleColors[user.role].text,
-                  border: `1px solid ${roleColors[user.role].border}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "0.82rem",
-                  fontWeight: "800",
-                  flexShrink: 0,
-                }}
-              >
-                {(user.name || user.email).charAt(0).toUpperCase()}
-              </span>
-              <span style={{ maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {user.name || user.email}
-              </span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
-            </button>
-            {showUserMenu && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "calc(100% + 8px)",
-                  right: 0,
-                  background: "#ffffff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "12px",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
-                  minWidth: "200px",
-                  zIndex: 100,
-                  overflow: "hidden",
-                }}
-              >
-                <div style={{ padding: "0.85rem 1rem", borderBottom: "1px solid #f1f5f9" }}>
-                  <p style={{ fontSize: "0.78rem", color: "#94a3b8", margin: "0 0 0.15rem" }}>Signed in as</p>
-                  <p style={{ fontSize: "0.85rem", fontWeight: "700", color: "#0f172a", margin: 0, wordBreak: "break-all" }}>{user.email}</p>
-                </div>
-                <button
-                  onClick={() => { setShowUserMenu(false); logout(); }}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.6rem",
-                    padding: "0.75rem 1rem",
-                    background: "none",
-                    border: "none",
-                    color: "#dc2626",
-                    fontSize: "0.88rem",
-                    fontWeight: "600",
-                    cursor: "pointer",
-                    textAlign: "left",
-                  }}
-                >
-                  <LogOut size={15} /> Sign Out
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>{/* end header wrapper */}
-
       {/* Sidebar + Content Layout */}
       <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", gap: "0", alignItems: "flex-start", padding: "1.5rem 2rem 5rem" }}>
 
@@ -1047,7 +906,7 @@ export default function DashboardPage() {
                   transition: "background 0.15s, color 0.15s",
                 }}
               >
-                <Ticket size={16} style={{ flexShrink: 0 }} /> Speaking Events
+                <Ticket size={16} style={{ flexShrink: 0 }} /> Events
                 <span style={{
                   marginLeft: "auto",
                   background: activeTab === "events" ? "rgba(255,255,255,0.2)" : "#f1f5f9",
@@ -1445,7 +1304,7 @@ export default function DashboardPage() {
                     My Scheduled Events &amp; Consultations
                   </h2>
                   <p style={{ color: "#64748b", fontSize: "0.92rem", margin: 0 }}>
-                    Speaking engagements where you have reserved seats, plus any personal meetings scheduled with Ven. Victor Onosemuode (Rtd.).
+                    Events where you have reserved seats, plus any personal meetings scheduled with Ven. Victor Onosemuode (Rtd.).
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: "0.75rem" }}>
@@ -1460,7 +1319,7 @@ export default function DashboardPage() {
                       fontWeight: "750",
                     }}
                   >
-                    Speaking Events <ExternalLink size={14} />
+                    Events <ExternalLink size={14} />
                   </Link>
                   <Link
                     href="/calendar"
@@ -1527,7 +1386,7 @@ export default function DashboardPage() {
                   {reservations.length > 0 && (
                     <div>
                       <h3 style={{ fontSize: "1.05rem", fontWeight: "700", color: "#334155", marginBottom: "0.75rem" }}>
-                        Speaking Event Reservations ({reservations.length})
+                        Event Reservations ({reservations.length})
                       </h3>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem" }}>
                         {reservations.map((res) => (
@@ -2232,17 +2091,17 @@ export default function DashboardPage() {
 
 
           {/* ───────────────────────────────────────────────────────────── */}
-          {/* TAB 9: SPEAKING EVENTS (Admin & Manager)                      */}
+          {/* TAB 9: EVENTS MANAGEMENT (Admin & Manager)                    */}
           {/* ───────────────────────────────────────────────────────────── */}
           {activeTab === "events" && (user.role === "admin" || user.role === "manager") && (
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
                 <div>
                   <h2 style={{ fontSize: "1.35rem", fontWeight: "750", margin: "0 0 0.25rem" }}>
-                    Speaking Events & Synods Management
+                    Events Management
                   </h2>
                   <p style={{ margin: 0, fontSize: "0.9rem", color: "#64748b" }}>
-                    Create and manage speaking engagements, synods, and church lectures with 50% poster visuals and seat reservations.
+                    Create and manage events, synods, services, and gatherings the client will attend, with poster visuals and seat reservations.
                   </p>
                 </div>
                 <Link href="/events" className="button button-rust" style={{ minHeight: "40px", fontSize: "0.85rem" }}>
@@ -2262,7 +2121,7 @@ export default function DashboardPage() {
                 }}
               >
                 <h3 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "1.25rem", color: "var(--ink, #173a32)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <PlusCircle size={18} style={{ color: "var(--rust)" }} /> Add New Speaking Event
+                  <PlusCircle size={18} style={{ color: "var(--rust)" }} /> Add New Event
                 </h3>
 
                 <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -2337,6 +2196,11 @@ export default function DashboardPage() {
                         <option value="Youth Convention">Youth Convention</option>
                         <option value="Colloquium">Colloquium</option>
                         <option value="Special Service">Special Service</option>
+                        <option value="Conference">Conference</option>
+                        <option value="Retreat">Retreat</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Anniversary">Anniversary</option>
+                        <option value="Other">Other</option>
                       </select>
                     </div>
                   </div>
@@ -2358,11 +2222,11 @@ export default function DashboardPage() {
 
                     <div>
                       <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "700", marginBottom: "0.3rem", color: "#334155" }}>
-                        Speaker Role
+                        Role
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g. Keynote Speaker & Pastoral Mentor"
+                        placeholder="e.g. Attendee, Speaker, Guest Minister, Special Guest"
                         value={newEventRole}
                         onChange={(e) => setNewEventRole(e.target.value)}
                         style={{ width: "100%", padding: "0.65rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
@@ -2422,7 +2286,7 @@ export default function DashboardPage() {
                       style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", minHeight: "42px" }}
                     >
                       {creatingEvent && <Loader2 size={16} className="animate-spin" />}
-                      Publish Speaking Event
+                      Publish Event
                     </button>
                   </div>
                 </form>
@@ -2431,7 +2295,7 @@ export default function DashboardPage() {
               {/* Events List */}
               <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "14px", overflow: "hidden" }}>
                 <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid #e2e8f0", fontWeight: "700", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>Published Speaking Engagements ({eventsList.length})</span>
+                  <span>Published Events ({eventsList.length})</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column" }}>
@@ -2470,7 +2334,7 @@ export default function DashboardPage() {
                             {ev.title}
                           </h4>
                           <p style={{ margin: 0, fontSize: "0.82rem", color: "#64748b" }}>
-                            📍 {ev.venue} • Role: <strong>{ev.clientRole || "Speaker"}</strong>
+                            📍 {ev.venue} • Role: <strong>{ev.clientRole || "Attendee"}</strong>
                           </p>
                         </div>
                       </div>

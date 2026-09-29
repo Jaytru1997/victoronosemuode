@@ -69,7 +69,7 @@ export default function EventsPage() {
   const [newTime, setNewTime] = useState("10:00 AM WAT");
   const [newVenue, setNewVenue] = useState("");
   const [newLocation, setNewLocation] = useState("");
-  const [newRole, setNewRole] = useState("Keynote Speaker & Pastoral Mentor");
+  const [newRole, setNewRole] = useState("Attendee");
   const [newCapacity, setNewCapacity] = useState("200");
   const [newCategory, setNewCategory] = useState("Synod");
   const [newDescription, setNewDescription] = useState("");
@@ -194,7 +194,7 @@ export default function EventsPage() {
         throw new Error(data.error || "Failed to create event.");
       }
 
-      success("Speaking event added successfully!", { title: "Event Created" });
+      success("Event added successfully!", { title: "Event Created" });
       setShowAddEventModal(false);
       setNewTitle("");
       setNewTheme("");
@@ -211,7 +211,7 @@ export default function EventsPage() {
     }
   };
 
-  const categories = ["All", "Synod", "Hymnology", "Youth Convention", "Colloquium", "Special Service"];
+  const categories = ["All", "Synod", "Hymnology", "Youth Convention", "Colloquium", "Special Service", "Conference", "Retreat", "Workshop", "Anniversary", "Other"];
 
   const filteredEvents =
     selectedCategory === "All"
@@ -250,7 +250,7 @@ export default function EventsPage() {
                   border: "1px solid rgba(192, 154, 88, 0.35)",
                 }}
               >
-                <Mic size={14} /> Ministry Engagements &amp; Calendar
+                <Calendar size={14} /> Ministry Engagements &amp; Calendar
               </div>
               <h1
                 style={{
@@ -262,7 +262,7 @@ export default function EventsPage() {
                   color: "#ffffff",
                 }}
               >
-                Speaking Engagements &amp; Events
+                Events &amp; Engagements
               </h1>
               <p
                 style={{
@@ -294,7 +294,7 @@ export default function EventsPage() {
                   boxShadow: "0 4px 14px rgba(0,0,0,0.25)",
                 }}
               >
-                <Plus size={18} /> Add Speaking Event
+                <Plus size={18} /> Add Event
               </button>
             )}
           </div>
@@ -340,7 +340,7 @@ export default function EventsPage() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "5rem 1rem", color: "var(--muted, #5c6e66)" }}>
             <Loader2 size={32} className="animate-spin" style={{ margin: "0 auto 1rem", opacity: 0.6 }} />
-            <p>Loading speaking engagements...</p>
+            <p>Loading events...</p>
           </div>
         ) : filteredEvents.length === 0 ? (
           <div style={{ textAlign: "center", padding: "4rem 1rem", background: "#ffffff", borderRadius: "12px", border: "1px solid var(--line, #d8ddd6)" }}>
@@ -452,7 +452,7 @@ export default function EventsPage() {
                           marginBottom: "0.25rem",
                         }}
                       >
-                        Speaking Feature
+                        Event Feature
                       </div>
                       <div style={{ fontSize: "1.1rem", fontWeight: "750", lineHeight: "1.3" }}>
                         {event.title}
@@ -489,7 +489,7 @@ export default function EventsPage() {
                             borderRadius: "6px",
                           }}
                         >
-                          <Sparkles size={13} /> {event.clientRole}
+                          <Sparkles size={13} /> {event.clientRole || "Attendee"}
                         </div>
                         <span
                           style={{
@@ -639,7 +639,7 @@ export default function EventsPage() {
             >
               <div>
                 <h3 style={{ margin: "0 0 0.2rem", fontSize: "1.2rem", fontFamily: "Georgia, serif", color: "var(--ink, #173a32)" }}>
-                  Add New Speaking Engagement
+                  Add New Event
                 </h3>
                 <span style={{ fontSize: "0.82rem", color: "var(--muted, #5c6e66)" }}>
                   Admin / Manager event publishing tool
@@ -699,15 +699,20 @@ export default function EventsPage() {
                     <option value="Youth Convention">Youth Convention</option>
                     <option value="Colloquium">Colloquium</option>
                     <option value="Special Service">Special Service</option>
+                    <option value="Conference">Conference</option>
+                    <option value="Retreat">Retreat</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Anniversary">Anniversary</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#334155", marginBottom: "0.3rem" }}>
-                    Client Speaking Role
+                    Role
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Keynote Speaker & Mentor"
+                    placeholder="e.g. Attendee, Speaker, Guest Minister, Special Guest"
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value)}
                     style={{ width: "100%", padding: "0.7rem 0.85rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
@@ -829,7 +834,7 @@ export default function EventsPage() {
                       <Loader2 size={16} className="animate-spin" /> Publishing...
                     </>
                   ) : (
-                    <>Publish Speaking Event</>
+                    <>Publish Event</>
                   )}
                 </button>
               </div>

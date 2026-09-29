@@ -256,7 +256,7 @@ export async function PATCH(
     }
 
     // Only admin or manager can approve/reject
-    if (!hasRole(session, ["admin", "manager"])) {
+    if (!hasRole(session.role, ["admin", "manager"])) {
       return NextResponse.json({ error: "Only admins or managers can approve or decline meetings." }, { status: 403 });
     }
 

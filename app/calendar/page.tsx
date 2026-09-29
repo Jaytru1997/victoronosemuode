@@ -643,7 +643,7 @@ export default function CalendarPage() {
               fontSize: "0.85rem",
             }}
           >
-            <Ticket size={15} /> View All Speaking Events
+            <Ticket size={15} /> View All Events
           </Link>
         </div>
       </div>
@@ -667,7 +667,7 @@ export default function CalendarPage() {
         <span style={{ color: "#64748b" }}>Calendar Legend:</span>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "#b45309" }}>
           <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#f59e0b" }} />
-          Public Speaking Event / Synod
+          Public Event / Synod
         </span>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "#1d4ed8" }}>
           <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#1d4ed8" }} />
@@ -794,7 +794,7 @@ export default function CalendarPage() {
                           textAlign: "left",
                           cursor: "pointer",
                         }}
-                        title={`Speaking Event: ${ev.title}`}
+                        title={`Event: ${ev.title}`}
                       >
                         📢 {ev.title}
                       </div>
@@ -920,7 +920,7 @@ export default function CalendarPage() {
             {eventsForDay(currentDate).length > 0 && (
               <div style={{ marginBottom: "1.5rem" }}>
                 <h3 style={{ fontSize: "0.95rem", fontWeight: "750", color: "#92400e", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <Sparkles size={16} /> Speaking Engagements & Events Today
+                  <Sparkles size={16} /> Events &amp; Engagements Today
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                   {eventsForDay(currentDate).map((ev) => (
@@ -955,7 +955,7 @@ export default function CalendarPage() {
                           {ev.title}
                         </h4>
                         <p style={{ margin: 0, fontSize: "0.85rem", color: "#a16207" }}>
-                          📍 {ev.venue} • {ev.clientRole || "Speaker"}
+                          📍 {ev.venue} • {ev.clientRole || "Attendee"}
                         </p>
                       </div>
                       <button
@@ -1065,7 +1065,7 @@ export default function CalendarPage() {
           {eventsForSelectedDate.length > 0 && (
             <div style={{ marginBottom: "1.25rem" }}>
               <div style={{ fontSize: "0.8rem", fontWeight: "800", textTransform: "uppercase", color: "#b45309", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
-                Speaking Events ({eventsForSelectedDate.length})
+                Events ({eventsForSelectedDate.length})
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 {eventsForSelectedDate.map((ev) => (
@@ -1422,7 +1422,7 @@ export default function CalendarPage() {
 
               <div style={{ position: "absolute", bottom: "1.25rem", left: "1.5rem", right: "1.5rem", color: "#ffffff" }}>
                 <span style={{ fontSize: "0.75rem", fontWeight: "800", textTransform: "uppercase", background: "var(--rust, #a64b32)", padding: "3px 9px", borderRadius: "999px", display: "inline-block", marginBottom: "0.5rem" }}>
-                  {selectedEvent.category || "Speaking Engagement"}
+                  {selectedEvent.category || "Event"}
                 </span>
                 <h2 style={{ fontSize: "1.35rem", fontWeight: "750", margin: "0", lineHeight: "1.25" }}>
                   {selectedEvent.title}
@@ -1460,8 +1460,8 @@ export default function CalendarPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.88rem", color: "#334155" }}>
                   <Sparkles size={16} style={{ color: "var(--rust)" }} />
                   <div>
-                    <div style={{ fontSize: "0.72rem", color: "#64748b", textTransform: "uppercase", fontWeight: "700" }}>Speaker Role</div>
-                    <strong>{selectedEvent.clientRole || "Main Speaker"}</strong>
+                    <div style={{ fontSize: "0.72rem", color: "#64748b", textTransform: "uppercase", fontWeight: "700" }}>Role</div>
+                    <strong>{selectedEvent.clientRole || "Attendee"}</strong>
                   </div>
                 </div>
               </div>

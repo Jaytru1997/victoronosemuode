@@ -26,7 +26,7 @@ This is a personal ministry and profile website that celebrates the life, faith 
 - **Member Portal** — Registered members can view their purchased books, track bank transfer payment status, and manage event reservations.
 - **Event Reservations** — Reserve seats for upcoming speaking engagements and synod events.
 - **Calendar Consultations** — Book personal meetings and pastoral consultations directly from the site.
-- **Administration Portal** — Admins and managers can approve payments, publish ministry posts, manage the books catalog, oversee user accounts, and schedule speaking events.
+- **Administration Portal** — Admins and managers can approve payments, publish ministry posts, manage the books catalog, oversee user accounts, and manage events.
 - **Role-based Access** — Three access levels: *Admin*, *Manager*, and *Member*, each with appropriate permissions.
 - **Global Notifications** — Real-time toast notifications throughout the site for confirmations and alerts.
 
