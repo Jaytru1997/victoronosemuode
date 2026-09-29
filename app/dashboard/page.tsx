@@ -1443,8 +1443,32 @@ export default function DashboardPage() {
                               <span style={{ fontSize: "0.75rem", fontWeight: "750", textTransform: "uppercase", color: "#1e3a8a" }}>
                                 Consultation
                               </span>
-                              <span style={{ fontSize: "0.72rem", fontWeight: "750", background: "#e0e7ff", color: "#3730a3", padding: "2px 8px", borderRadius: "999px" }}>
-                                {m.status}
+                              <span
+                                style={{
+                                  fontSize: "0.72rem",
+                                  fontWeight: "750",
+                                  textTransform: "uppercase",
+                                  background:
+                                    m.status === "pending"
+                                      ? "#fef3c7"
+                                      : m.status === "scheduled"
+                                        ? "#dcfce7"
+                                        : m.status === "cancelled"
+                                          ? "#fee2e2"
+                                          : "#e0e7ff",
+                                  color:
+                                    m.status === "pending"
+                                      ? "#b45309"
+                                      : m.status === "scheduled"
+                                        ? "#15803d"
+                                        : m.status === "cancelled"
+                                          ? "#b91c1c"
+                                          : "#3730a3",
+                                  padding: "2px 8px",
+                                  borderRadius: "999px",
+                                }}
+                              >
+                                {m.status === "pending" ? "Pending Approval" : m.status}
                               </span>
                             </div>
                             <h4 style={{ margin: "0 0 0.4rem", fontSize: "1rem", color: "var(--ink, #173a32)" }}>
@@ -1453,7 +1477,14 @@ export default function DashboardPage() {
                             <div style={{ fontSize: "0.82rem", color: "#475569", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
                               <div><Clock size={13} style={{ display: "inline", marginRight: "4px" }} /> {new Date(m.startTime).toLocaleString()}</div>
                               {m.location && <div><MapPin size={13} style={{ display: "inline", marginRight: "4px" }} /> {m.location}</div>}
-                              {m.meetingUrl && <div><Video size={13} style={{ display: "inline", marginRight: "4px" }} /> <a href={m.meetingUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#1e3a8a", textDecoration: "underline" }}>Join Online Meeting</a></div>}
+                              {m.status === "scheduled" && m.meetingUrl && (
+                                <div><Video size={13} style={{ display: "inline", marginRight: "4px" }} /> <a href={m.meetingUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#1e3a8a", textDecoration: "underline" }}>Join Online Meeting</a></div>
+                              )}
+                              {m.status === "pending" && (
+                                <div style={{ marginTop: "0.35rem", padding: "0.4rem 0.6rem", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "6px", fontSize: "0.76rem", color: "#92400e" }}>
+                                  ⏳ Awaiting admin/manager approval. You will receive meeting confirmation once reviewed.
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}

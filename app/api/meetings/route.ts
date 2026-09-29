@@ -199,7 +199,7 @@ export async function POST(req: NextRequest) {
       message:
         session.role === "admin" || session.role === "manager"
           ? "Meeting scheduled successfully."
-          : "Meeting request submitted. Awaiting admin confirmation.",
+          : "Consultation request submitted. Awaiting admin approval.",
       meetingId: meetingId.toString(),
       status: session.role === "admin" || session.role === "manager" ? "scheduled" : "pending",
     });

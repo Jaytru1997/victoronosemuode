@@ -46,7 +46,7 @@ interface MeetingData {
   location?: string;
   meetingUrl?: string;
   notes?: string;
-  status: "scheduled" | "completed" | "cancelled" | "rescheduled";
+  status: "pending" | "scheduled" | "completed" | "cancelled" | "rescheduled";
   cancellationReason?: string;
   createdAt: string;
   updatedAt: string;
@@ -205,6 +205,7 @@ function doesEventMatchDay(eventDateStr: string, day: Date): boolean {
 }
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
+  pending: { bg: "#fef3c7", color: "#b45309", label: "Pending Approval" },
   scheduled: { bg: "#dbeafe", color: "#1d4ed8", label: "Scheduled" },
   completed: { bg: "#dcfce7", color: "#15803d", label: "Completed" },
   cancelled: { bg: "#fde8e8", color: "#b91c1c", label: "Cancelled" },
@@ -216,7 +217,7 @@ const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }
 export default function CalendarPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { success, error: toastError, warning } = useToast();
+  const { success, error: toastError, warning, info } = useToast();
 
   // ── Calendar state ──
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -490,14 +491,16 @@ export default function CalendarPage() {
         return;
       }
 
-      success(
-        isRescheduling
-          ? "Meeting rescheduled successfully."
-          : canManage
-            ? "Meeting scheduled successfully."
-            : "Consultation booked successfully with Ven. Dr. Victor Onosemuode (Rtd.)!",
-        { title: isRescheduling ? "Rescheduled" : "Booking Confirmed" }
-      );
+      if (isRescheduling) {
+        success("Meeting rescheduled successfully.", { title: "Rescheduled" });
+      } else if (data.status === "pending" || !canManage) {
+        info(
+          "Your consultation request has been submitted and is currently pending approval by the administration. You will be notified once confirmed.",
+          { title: "Consultation Request Pending", duration: 7000 }
+        );
+      } else {
+        success("Meeting scheduled successfully.", { title: "Meeting Scheduled" });
+      }
       setShowScheduleModal(false);
       resetForm();
       fetchData();
@@ -533,6 +536,40 @@ export default function CalendarPage() {
       toastError("Failed to cancel meeting. Please try again.");
     } finally {
       setCancelling(false);
+    }
+  };
+
+  /* ── Approve / Decline meeting (admin/manager) ── */
+  const handleApproveMeeting = async (meetingId: string) => {
+    try {
+      const res = await fetch(`/api/meetings/${meetingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "scheduled" }),
+      });
+      if (!res.ok) throw new Error("Failed to approve");
+      success("Meeting approved and confirmed for the client!", { title: "Meeting Approved" });
+      setShowDetailModal(false);
+      fetchData();
+    } catch {
+      toastError("Failed to approve meeting.");
+    }
+  };
+
+  const handleDeclineMeeting = async (meetingId: string) => {
+    if (!confirm("Are you sure you want to decline this consultation request?")) return;
+    try {
+      const res = await fetch(`/api/meetings/${meetingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled", cancellationReason: "Declined by admin." }),
+      });
+      if (!res.ok) throw new Error("Failed to decline");
+      success("Meeting request declined.", { title: "Meeting Declined" });
+      setShowDetailModal(false);
+      fetchData();
+    } catch {
+      toastError("Failed to decline meeting.");
     }
   };
 
@@ -668,6 +705,10 @@ export default function CalendarPage() {
         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "#b45309" }}>
           <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#f59e0b" }} />
           Public Event / Synod
+        </span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "#b45309" }}>
+          <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#f59e0b" }} />
+          Pending Approval
         </span>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "#1d4ed8" }}>
           <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#1d4ed8" }} />
@@ -1351,6 +1392,28 @@ export default function CalendarPage() {
                 </div>
               )}
 
+              {/* Notice for non-admin clients */}
+              {!canManage && (
+                <div
+                  style={{
+                    background: "#fffbeb",
+                    border: "1px solid #fde68a",
+                    borderRadius: "8px",
+                    padding: "0.65rem 0.85rem",
+                    fontSize: "0.82rem",
+                    color: "#92400e",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <AlertCircle size={15} style={{ flexShrink: 0, marginTop: "2px" }} />
+                  <div>
+                    <strong>Pending Approval:</strong> Consultation requests are placed on <em>Pending Approval</em> until confirmed by Ven. Victor Onosemuode (Rtd.) or the admin team.
+                  </div>
+                </div>
+              )}
+
               {/* Submit */}
               <div className="cal-form-actions" style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
                 <button
@@ -1372,7 +1435,7 @@ export default function CalendarPage() {
                     ? "Update Meeting"
                     : canManage
                       ? "Confirm Meeting"
-                      : "Book Consultation"}
+                      : "Submit Consultation Request"}
                 </button>
               </div>
             </form>
@@ -1560,6 +1623,15 @@ export default function CalendarPage() {
                 </div>
               )}
 
+              {selectedMeeting.status === "pending" && (
+                <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "8px", padding: "0.75rem 1rem", color: "#92400e", fontSize: "0.84rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                  <div>
+                    <strong>Status: Pending Approval</strong> — This consultation request is awaiting review by the admin/manager. Meeting links and calendar export will become active upon approval.
+                  </div>
+                </div>
+              )}
+
               {selectedMeeting.notes && (
                 <div style={{ fontSize: "0.88rem", color: "#475569", padding: "0.6rem 0.85rem", background: "#f8f7f1", borderRadius: "6px" }}>
                   <strong>Notes:</strong> {selectedMeeting.notes}
@@ -1569,23 +1641,51 @@ export default function CalendarPage() {
 
             {/* Actions */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", justifyContent: "flex-end", borderTop: "1px solid #e2e8f0", paddingTop: "1rem" }}>
-              <button
-                type="button"
-                className="button button-ghost"
-                style={{ fontSize: "0.82rem" }}
-                onClick={() => handleDownloadICS(selectedMeeting)}
-              >
-                <Download size={14} /> Download .ICS
-              </button>
-              <a
-                href={getGoogleCalURL(selectedMeeting)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="button button-ghost"
-                style={{ fontSize: "0.82rem" }}
-              >
-                <ExternalLink size={14} /> Add to Google Calendar
-              </a>
+              {/* Only show export if meeting is confirmed */}
+              {selectedMeeting.status !== "pending" && selectedMeeting.status !== "cancelled" && (
+                <>
+                  <button
+                    type="button"
+                    className="button button-ghost"
+                    style={{ fontSize: "0.82rem" }}
+                    onClick={() => handleDownloadICS(selectedMeeting)}
+                  >
+                    <Download size={14} /> Download .ICS
+                  </button>
+                  <a
+                    href={getGoogleCalURL(selectedMeeting)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="button button-ghost"
+                    style={{ fontSize: "0.82rem" }}
+                  >
+                    <ExternalLink size={14} /> Add to Google Calendar
+                  </a>
+                </>
+              )}
+
+              {/* Admin actions for pending meeting */}
+              {canManage && selectedMeeting.status === "pending" && (
+                <>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ fontSize: "0.82rem", background: "#16a34a", color: "#ffffff", border: "none", padding: "0.45rem 1rem" }}
+                    onClick={() => handleApproveMeeting(selectedMeeting._id)}
+                  >
+                    ✓ Approve Request
+                  </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ fontSize: "0.82rem", background: "#fee2e2", color: "#b91c1c", border: "1px solid #fca5a5", padding: "0.45rem 1rem" }}
+                    onClick={() => handleDeclineMeeting(selectedMeeting._id)}
+                  >
+                    ✕ Decline Request
+                  </button>
+                </>
+              )}
+
               {canManage && selectedMeeting.status === "scheduled" && (
                 <>
                   <button
