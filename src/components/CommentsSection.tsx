@@ -414,7 +414,7 @@ export default function CommentsSection({
           >
             <MessageSquare size={32} style={{ margin: "0 auto 0.75rem", opacity: 0.3 }} />
             <p style={{ margin: 0, fontSize: "0.95rem", fontWeight: "600" }}>
-              No confirmed comments yet on this article.
+              No comments yet on this article.
             </p>
             <p style={{ margin: "0.35rem 0 0", fontSize: "0.85rem" }}>
               Be the first to share an encouraging word or reflection!
