@@ -32,6 +32,7 @@ import {
   MapPin,
   FileText,
   Video,
+  MessageSquare,
 } from "lucide-react";
 import { useCart } from "@/src/context/CartContext";
 import { useAuth } from "@/src/context/AuthContext";
@@ -56,11 +57,27 @@ interface BookAdminItem {
 interface PostItem {
   _id: string;
   title: string;
+  slug?: string;
   excerpt?: string;
   content: string;
   category?: string;
   authorEmail?: string;
   createdAt: string;
+}
+
+interface CommentAdminItem {
+  _id: string;
+  postId: string;
+  postSlug?: string;
+  postTitle?: string;
+  userId: string;
+  authorEmail: string;
+  authorName: string;
+  content: string;
+  status: "pending" | "approved" | "rejected";
+  createdAt: string;
+  approvedAt?: string;
+  approvedBy?: string;
 }
 
 interface UserItem {
@@ -147,6 +164,7 @@ type TabType =
   | "scheduled-events"
   | "approvals"
   | "posts"
+  | "comments"
   | "books"
   | "users"
   | "schedule"
@@ -186,6 +204,12 @@ export default function DashboardPage() {
   const [postExcerpt, setPostExcerpt] = useState("");
   const [postContent, setPostContent] = useState("");
   const [posting, setPosting] = useState(false);
+
+  // Comments moderation state
+  const [commentsList, setCommentsList] = useState<CommentAdminItem[]>([]);
+  const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
+  const [commentFilter, setCommentFilter] = useState<"pending" | "approved" | "all">("pending");
+  const [commentActionLoading, setCommentActionLoading] = useState<string | null>(null);
 
   const [booksAdminList, setBooksAdminList] = useState<BookAdminItem[]>([]);
   const [newBookTitle, setNewBookTitle] = useState("");
@@ -309,6 +333,62 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchComments = async () => {
+    try {
+      const res = await fetch("/api/comments");
+      if (res.ok) {
+        const data = await res.json();
+        setCommentsList(data.comments || []);
+        setPendingCommentsCount(data.pendingCount || 0);
+      }
+    } catch (err) {
+      console.error("Failed to load comments:", err);
+    }
+  };
+
+  const handleUpdateCommentStatus = async (commentId: string, status: "approved" | "rejected") => {
+    setCommentActionLoading(commentId);
+    try {
+      const res = await fetch(`/api/comments/${commentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        success(data.message || `Comment ${status}`);
+        fetchComments();
+      } else {
+        error(data.error || "Failed to update comment status");
+      }
+    } catch {
+      error("Network error while updating comment status");
+    } finally {
+      setCommentActionLoading(null);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!confirm("Are you sure you want to permanently delete this comment?")) return;
+    setCommentActionLoading(commentId);
+    try {
+      const res = await fetch(`/api/comments/${commentId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        success(data.message || "Comment deleted");
+        fetchComments();
+      } else {
+        error(data.error || "Failed to delete comment");
+      }
+    } catch {
+      error("Network error while deleting comment");
+    } finally {
+      setCommentActionLoading(null);
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       const res = await fetch("/api/users");
@@ -342,6 +422,7 @@ export default function DashboardPage() {
       fetchEvents();
       if (user.role === "admin" || user.role === "manager") {
         fetchPosts();
+        fetchComments();
         fetchUsers();
       }
     }
@@ -803,6 +884,45 @@ export default function DashboardPage() {
                 }}
               >
                 <PenTool size={16} style={{ flexShrink: 0 }} /> Manage Posts
+              </button>
+
+              <button
+                onClick={() => setActiveTab("comments")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.65rem",
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
+                  borderRadius: "10px",
+                  border: "none",
+                  background: activeTab === "comments" ? "#1e3a8a" : "transparent",
+                  color: activeTab === "comments" ? "#ffffff" : "#475569",
+                  fontWeight: "600",
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  marginBottom: "2px",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                <MessageSquare size={16} style={{ flexShrink: 0 }} /> Moderate Comments
+                {pendingCommentsCount > 0 && (
+                  <span
+                    style={{
+                      marginLeft: "auto",
+                      background: activeTab === "comments" ? "#f59e0b" : "#fef3c7",
+                      color: activeTab === "comments" ? "#ffffff" : "#b45309",
+                      fontSize: "10px",
+                      fontWeight: "800",
+                      padding: "1px 6px",
+                      borderRadius: "999px",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {pendingCommentsCount}
+                  </span>
+                )}
               </button>
 
               <button
@@ -1803,13 +1923,376 @@ export default function DashboardPage() {
                         <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{new Date(p.createdAt).toLocaleDateString()}</span>
                       </div>
                       <p style={{ margin: "0 0 0.5rem", fontSize: "0.88rem", color: "#475569" }}>{p.excerpt || p.content.slice(0, 140)}...</p>
-                      <span style={{ fontSize: "0.75rem", background: "#f1f5f9", padding: "2px 8px", borderRadius: "4px", color: "#475569" }}>
-                        {p.category}
-                      </span>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem" }}>
+                        <span style={{ fontSize: "0.75rem", background: "#f1f5f9", padding: "2px 8px", borderRadius: "4px", color: "#475569" }}>
+                          {p.category}
+                        </span>
+                        <Link
+                          href={`/blog/${p.slug || p._id}`}
+                          target="_blank"
+                          style={{
+                            fontSize: "0.8rem",
+                            fontWeight: "600",
+                            color: "#1e3a8a",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.25rem",
+                          }}
+                        >
+                          View Live Post <ExternalLink size={13} />
+                        </Link>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* TAB: MODERATE COMMENTS (Admin & Manager)                      */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          {activeTab === "comments" && (user.role === "admin" || user.role === "manager") && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              <div
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "14px",
+                  padding: "1.75rem 2rem",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "1rem",
+                }}
+              >
+                <div>
+                  <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", margin: "0 0 0.35rem" }}>
+                    Blog Comments Moderation
+                  </h2>
+                  <p style={{ margin: 0, color: "#64748b", fontSize: "0.9rem" }}>
+                    Review submitted reflections and approve them before they are visible on ministry posts.
+                  </p>
+                </div>
+
+                {/* Filter Pills */}
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => setCommentFilter("pending")}
+                    style={{
+                      padding: "0.45rem 0.9rem",
+                      borderRadius: "8px",
+                      fontSize: "0.82rem",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      border: "1px solid",
+                      borderColor: commentFilter === "pending" ? "#f59e0b" : "#e2e8f0",
+                      background: commentFilter === "pending" ? "#fffbeb" : "#ffffff",
+                      color: commentFilter === "pending" ? "#b45309" : "#475569",
+                    }}
+                  >
+                    Pending Confirmation ({commentsList.filter((c) => c.status === "pending").length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCommentFilter("approved")}
+                    style={{
+                      padding: "0.45rem 0.9rem",
+                      borderRadius: "8px",
+                      fontSize: "0.82rem",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      border: "1px solid",
+                      borderColor: commentFilter === "approved" ? "#10b981" : "#e2e8f0",
+                      background: commentFilter === "approved" ? "#ecfdf5" : "#ffffff",
+                      color: commentFilter === "approved" ? "#047857" : "#475569",
+                    }}
+                  >
+                    Approved Live ({commentsList.filter((c) => c.status === "approved").length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCommentFilter("all")}
+                    style={{
+                      padding: "0.45rem 0.9rem",
+                      borderRadius: "8px",
+                      fontSize: "0.82rem",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      border: "1px solid",
+                      borderColor: commentFilter === "all" ? "#1e3a8a" : "#e2e8f0",
+                      background: commentFilter === "all" ? "#eff6ff" : "#ffffff",
+                      color: commentFilter === "all" ? "#1e3a8a" : "#475569",
+                    }}
+                  >
+                    All ({commentsList.length})
+                  </button>
+                </div>
+              </div>
+
+              {/* Comments List */}
+              {commentsList.filter(
+                (c) => commentFilter === "all" || c.status === commentFilter
+              ).length === 0 ? (
+                <div
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "14px",
+                    padding: "3.5rem 2rem",
+                    textAlign: "center",
+                    color: "#64748b",
+                  }}
+                >
+                  <MessageSquare size={36} style={{ margin: "0 auto 0.75rem", opacity: 0.3 }} />
+                  <h3 style={{ margin: "0 0 0.35rem", fontSize: "1.1rem", color: "#0f172a" }}>
+                    No {commentFilter === "all" ? "" : commentFilter} comments
+                  </h3>
+                  <p style={{ margin: 0, fontSize: "0.88rem" }}>
+                    {commentFilter === "pending"
+                      ? "All submitted comments have been reviewed! New submissions will appear here."
+                      : "No comments match this filter."}
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  {commentsList
+                    .filter(
+                      (c) => commentFilter === "all" || c.status === commentFilter
+                    )
+                    .map((comm) => (
+                      <div
+                        key={comm._id}
+                        style={{
+                          background: "#ffffff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "12px",
+                          padding: "1.5rem",
+                          boxShadow: "0 1px 4px rgba(0,0,0,0.02)",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "0.85rem",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            flexWrap: "wrap",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                            <div
+                              style={{
+                                width: "34px",
+                                height: "34px",
+                                borderRadius: "50%",
+                                background: "#f1f5f9",
+                                color: "#1e3a8a",
+                                fontWeight: "750",
+                                fontSize: "0.82rem",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              {comm.authorName?.slice(0, 2).toUpperCase() || "U"}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: "700", fontSize: "0.92rem", color: "#0f172a" }}>
+                                {comm.authorName} <span style={{ color: "#64748b", fontWeight: "400", fontSize: "0.82rem" }}>({comm.authorEmail})</span>
+                              </div>
+                              <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                                Submitted {new Date(comm.createdAt).toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            {comm.status === "pending" && (
+                              <span
+                                style={{
+                                  fontSize: "0.72rem",
+                                  fontWeight: "800",
+                                  background: "#fef3c7",
+                                  color: "#b45309",
+                                  padding: "3px 9px",
+                                  borderRadius: "999px",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "0.25rem",
+                                }}
+                              >
+                                <Clock size={11} /> Awaiting Confirmation
+                              </span>
+                            )}
+                            {comm.status === "approved" && (
+                              <span
+                                style={{
+                                  fontSize: "0.72rem",
+                                  fontWeight: "800",
+                                  background: "#ecfdf5",
+                                  color: "#047857",
+                                  padding: "3px 9px",
+                                  borderRadius: "999px",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "0.25rem",
+                                }}
+                              >
+                                <CheckCircle2 size={11} /> Live &amp; Approved
+                              </span>
+                            )}
+                            {comm.status === "rejected" && (
+                              <span
+                                style={{
+                                  fontSize: "0.72rem",
+                                  fontWeight: "800",
+                                  background: "#fef2f2",
+                                  color: "#b91c1c",
+                                  padding: "3px 9px",
+                                  borderRadius: "999px",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "0.25rem",
+                                }}
+                              >
+                                <XCircle size={11} /> Rejected
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Associated Post */}
+                        <div
+                          style={{
+                            background: "#f8fafc",
+                            padding: "0.6rem 0.9rem",
+                            borderRadius: "8px",
+                            fontSize: "0.82rem",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <span style={{ color: "#64748b" }}>
+                            Post: <strong style={{ color: "#0f172a" }}>{comm.postTitle || "Ministry Article"}</strong>
+                          </span>
+                          <Link
+                            href={`/blog/${comm.postSlug || comm.postId}`}
+                            target="_blank"
+                            style={{
+                              color: "#1e3a8a",
+                              fontWeight: "600",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.25rem",
+                            }}
+                          >
+                            View Post <ExternalLink size={12} />
+                          </Link>
+                        </div>
+
+                        {/* Comment Text */}
+                        <div
+                          style={{
+                            fontSize: "0.92rem",
+                            lineHeight: "1.6",
+                            color: "#334155",
+                            padding: "0.5rem 0",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        >
+                          &ldquo;{comm.content}&rdquo;
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
+                            gap: "0.65rem",
+                            paddingTop: "0.75rem",
+                            borderTop: "1px solid #f1f5f9",
+                          }}
+                        >
+                          {comm.status !== "approved" && (
+                            <button
+                              type="button"
+                              disabled={commentActionLoading === comm._id}
+                              onClick={() => handleUpdateCommentStatus(comm._id, "approved")}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.35rem",
+                                padding: "0.45rem 0.9rem",
+                                borderRadius: "6px",
+                                background: "#166534",
+                                color: "#ffffff",
+                                border: "none",
+                                fontSize: "0.82rem",
+                                fontWeight: "700",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <CheckCircle2 size={14} /> Approve Comment
+                            </button>
+                          )}
+
+                          {comm.status === "approved" && (
+                            <button
+                              type="button"
+                              disabled={commentActionLoading === comm._id}
+                              onClick={() => handleUpdateCommentStatus(comm._id, "rejected")}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.35rem",
+                                padding: "0.45rem 0.85rem",
+                                borderRadius: "6px",
+                                background: "#fef2f2",
+                                color: "#991b1b",
+                                border: "1px solid #fecaca",
+                                fontSize: "0.82rem",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <XCircle size={14} /> Revoke Approval
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            disabled={commentActionLoading === comm._id}
+                            onClick={() => handleDeleteComment(comm._id)}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.35rem",
+                              padding: "0.45rem 0.85rem",
+                              borderRadius: "6px",
+                              background: "#ffffff",
+                              color: "#64748b",
+                              border: "1px solid #cbd5e1",
+                              fontSize: "0.82rem",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <Trash2 size={13} /> Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           )}
 

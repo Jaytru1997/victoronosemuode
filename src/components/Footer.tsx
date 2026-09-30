@@ -24,12 +24,12 @@ export default function Footer() {
             <h2 className="footer-heading">Explore</h2>
             <nav className="footer-links" aria-label="Footer navigation">
               <Link href="/about">Biography</Link>
+              <Link href="/blog">Blog &amp; Articles</Link>
               <Link href="/books">Books</Link>
               <Link href="/events">Events</Link>
               <Link href="/services">Services</Link>
               <Link href="/ministry">Ministry</Link>
               <Link href="/legacy">Legacy</Link>
-              <Link href="/community">Community</Link>
               <Link href="/calendar">Calendar</Link>
             </nav>
           </div>

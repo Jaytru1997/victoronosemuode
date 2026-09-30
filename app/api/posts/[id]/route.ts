@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession, hasRole } from "@/src/lib/auth";
-import { updatePost, deletePost, getPostById } from "@/src/models/post";
+import { updatePost, deletePost, getPostBySlugOrId } from "@/src/models/post";
 
 export async function GET(
   req: NextRequest,
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params;
-    const post = await getPostById(id);
+    const post = await getPostBySlugOrId(id);
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }

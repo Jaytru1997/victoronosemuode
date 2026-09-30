@@ -12,12 +12,12 @@ import CurrencySwitcher from "@/src/components/CurrencySwitcher";
 
 const navLinks = [
   { name: "Biography", href: "/about" },
+  { name: "Blog", href: "/blog" },
   { name: "Books", href: "/books" },
   { name: "Events", href: "/events" },
   { name: "Services", href: "/services" },
   { name: "Ministry", href: "/ministry" },
   { name: "Legacy", href: "/legacy" },
-  { name: "Community", href: "/community" },
   { name: "Calendar", href: "/calendar" },
 ];
 

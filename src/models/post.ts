@@ -36,6 +36,36 @@ export async function getPostById(id: string) {
   }
 }
 
+/** Get a single post by slug */
+export async function getPostBySlug(slug: string) {
+  try {
+    const collection = await getPostsCollection();
+    return await collection.findOne({ slug });
+  } catch {
+    return null;
+  }
+}
+
+/** Get a single post by slug or ID */
+export async function getPostBySlugOrId(identifier: string) {
+  try {
+    const collection = await getPostsCollection();
+    // First try by slug
+    let post = await collection.findOne({ slug: identifier });
+    if (post) return post;
+
+    // Then try by ObjectId if it looks like one
+    if (ObjectId.isValid(identifier)) {
+      post = await collection.findOne({ _id: new ObjectId(identifier) });
+      if (post) return post;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /** Create a new post */
 export async function createPost(
   post: Omit<Post, "_id" | "createdAt" | "updatedAt">
