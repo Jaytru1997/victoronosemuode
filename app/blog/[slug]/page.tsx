@@ -65,10 +65,10 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   const formattedDate = post.createdAt
     ? new Date(post.createdAt).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    })
     : "";
 
   // Split content by double linebreaks into paragraphs

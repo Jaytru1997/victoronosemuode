@@ -143,27 +143,6 @@ export default function CommentsSection({
         </h2>
       </div>
 
-      {/* Moderation Note */}
-      <div
-        style={{
-          background: "rgba(192, 154, 88, 0.12)",
-          border: "1px solid rgba(192, 154, 88, 0.35)",
-          borderRadius: "8px",
-          padding: "0.75rem 1rem",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.65rem",
-          fontSize: "0.85rem",
-          color: "var(--ink, #173a32)",
-          marginBottom: "2rem",
-        }}
-      >
-        <Clock size={16} style={{ color: "var(--gold, #c09a58)", flexShrink: 0 }} />
-        <span>
-          <strong>Community Guideline:</strong> Comments are reviewed and confirmed by an administrator or manager before appearing publicly on this post.
-        </span>
-      </div>
-
       {/* COMMENT SUBMISSION FORM OR LOGIN PROMPT */}
       {user ? (
         <div

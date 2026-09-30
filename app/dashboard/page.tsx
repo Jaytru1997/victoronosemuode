@@ -33,6 +33,8 @@ import {
   FileText,
   Video,
   MessageSquare,
+  Menu,
+  X as XIcon,
 } from "lucide-react";
 import { useCart } from "@/src/context/CartContext";
 import { useAuth } from "@/src/context/AuthContext";
@@ -177,6 +179,8 @@ export default function DashboardPage() {
   const { success, error, info } = useToast();
 
   const [activeTab, setActiveTab] = useState<TabType>("pending-payments");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navTo = (tab: TabType) => { setActiveTab(tab); setSidebarOpen(false); };
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [reservations, setReservations] = useState<EventReservationItem[]>([]);
   const [meetings, setMeetings] = useState<MeetingItem[]>([]);
@@ -204,8 +208,6 @@ export default function DashboardPage() {
   const [postExcerpt, setPostExcerpt] = useState("");
   const [postContent, setPostContent] = useState("");
   const [posting, setPosting] = useState(false);
-  const [editingPostId, setEditingPostId] = useState<string | null>(null);
-  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
   // Comments moderation state
   const [commentsList, setCommentsList] = useState<CommentAdminItem[]>([]);
@@ -430,26 +432,6 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  // Handle URL query parameters (e.g. ?tab=posts&edit=POST_ID)
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get("tab") as TabType | null;
-      const editPostIdParam = params.get("edit");
-      if (tabParam) {
-        setActiveTab(tabParam);
-      }
-      if (editPostIdParam && posts.length > 0) {
-        const targetPost = posts.find(
-          (p) => p._id === editPostIdParam || p.slug === editPostIdParam
-        );
-        if (targetPost) {
-          startEditingPost(targetPost);
-        }
-      }
-    }
-  }, [posts]);
-
   // Admin Event Creation Handler
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -598,101 +580,33 @@ export default function DashboardPage() {
     }
   };
 
-  // Post Editing & Creation Handlers
-  const startEditingPost = (p: PostItem) => {
-    setEditingPostId(p._id);
-    setPostTitle(p.title);
-    setPostCategory(p.category || "Ministry & Teachings");
-    setPostExcerpt(p.excerpt || "");
-    setPostContent(p.content);
-    setActiveTab("posts");
-    const formElement = document.getElementById("post-form-card");
-    if (formElement) {
-      formElement.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const cancelEditingPost = () => {
-    setEditingPostId(null);
-    setPostTitle("");
-    setPostCategory("Ministry & Teachings");
-    setPostExcerpt("");
-    setPostContent("");
-  };
-
-  const handleSavePost = async (e: React.FormEvent) => {
+  // Admin Post Creation Handler
+  const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!postTitle.trim() || !postContent.trim()) {
-      error("Title and content are required.");
-      return;
-    }
     setPosting(true);
     try {
-      if (editingPostId) {
-        // Update existing post
-        const res = await fetch(`/api/posts/${editingPostId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: postTitle,
-            category: postCategory,
-            excerpt: postExcerpt,
-            content: postContent,
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to update post");
-
-        success("Post updated successfully!", { title: "Post Updated" });
-        cancelEditingPost();
-        fetchPosts();
-      } else {
-        // Publish new post
-        const res = await fetch("/api/posts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: postTitle,
-            category: postCategory,
-            excerpt: postExcerpt,
-            content: postContent,
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to publish post");
-
-        success("Post published successfully!", { title: "Post Live" });
-        setPostTitle("");
-        setPostExcerpt("");
-        setPostContent("");
-        fetchPosts();
-      }
-    } catch (err: unknown) {
-      error(err instanceof Error ? err.message : "Error saving post");
-    } finally {
-      setPosting(false);
-    }
-  };
-
-  const handleDeletePost = async (postId: string, title: string) => {
-    if (!confirm(`Are you sure you want to permanently delete "${title}"?`)) return;
-    setDeletingPostId(postId);
-    try {
-      const res = await fetch(`/api/posts/${postId}`, {
-        method: "DELETE",
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: postTitle,
+          category: postCategory,
+          excerpt: postExcerpt,
+          content: postContent,
+        }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to delete post");
+      if (!res.ok) throw new Error(data.error || "Failed to publish post");
 
-      success("Post removed successfully", { title: "Post Deleted" });
-      if (editingPostId === postId) {
-        cancelEditingPost();
-      }
+      success("Post published successfully!", { title: "Post Live" });
+      setPostTitle("");
+      setPostExcerpt("");
+      setPostContent("");
       fetchPosts();
     } catch (err: unknown) {
-      error(err instanceof Error ? err.message : "Error deleting post");
+      error(err instanceof Error ? err.message : "Error publishing post");
     } finally {
-      setDeletingPostId(null);
+      setPosting(false);
     }
   };
 
@@ -785,30 +699,45 @@ export default function DashboardPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
+    <div className="db-page">
+      {/* Mobile top bar */}
+      <div className="db-topbar">
+        <span className="db-topbar-title">Dashboard</span>
+        <button
+          className="db-hamburger"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open navigation"
+        >
+          <Menu size={22} />
+        </button>
+      </div>
+
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div className="db-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Sidebar + Content Layout */}
-      <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", gap: "0", alignItems: "flex-start", padding: "1.5rem 2rem 5rem" }}>
+      <div className="db-layout">
 
         {/* ── Sidebar ── */}
-        <aside style={{
-          width: "240px",
-          flexShrink: 0,
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "16px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-          padding: "1.25rem 0.75rem",
-          position: "sticky",
-          top: "80px",
-          marginRight: "1.5rem",
-          alignSelf: "flex-start",
-        }}>
-          <p style={{ fontSize: "0.7rem", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.08em", color: "#94a3b8", padding: "0 0.75rem", marginBottom: "0.5rem" }}>Navigation</p>
+        <aside className={`db-sidebar${sidebarOpen ? " db-sidebar--open" : ""}`}>
+          {/* Mobile close button */}
+          <button
+            className="db-sidebar-close"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation"
+          >
+            <XIcon size={20} />
+          </button>
+
+
+          <p style={{ fontSize: "0.7rem", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.08em", color: "#94a3b8", padding: "0 0.75rem", marginBottom: "0.5rem" }}>Dashboard</p>
 
           {/* Admin Approvals Tab */}
           {(user.role === "admin" || user.role === "manager") && (
             <button
-              onClick={() => setActiveTab("approvals")}
+              onClick={() => navTo("approvals")}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -845,7 +774,7 @@ export default function DashboardPage() {
 
           {/* Pending Payments */}
           <button
-            onClick={() => setActiveTab("pending-payments")}
+            onClick={() => navTo("pending-payments")}
             style={{
               display: "flex",
               alignItems: "center",
@@ -881,7 +810,7 @@ export default function DashboardPage() {
 
           {/* Purchased Books */}
           <button
-            onClick={() => setActiveTab("purchased-books")}
+            onClick={() => navTo("purchased-books")}
             style={{
               display: "flex",
               alignItems: "center",
@@ -915,7 +844,7 @@ export default function DashboardPage() {
 
           {/* Scheduled Events */}
           <button
-            onClick={() => setActiveTab("scheduled-events")}
+            onClick={() => navTo("scheduled-events")}
             style={{
               display: "flex",
               alignItems: "center",
@@ -954,7 +883,7 @@ export default function DashboardPage() {
               <p style={{ fontSize: "0.7rem", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.08em", color: "#94a3b8", padding: "0 0.75rem", marginBottom: "0.5rem" }}>Admin</p>
 
               <button
-                onClick={() => setActiveTab("posts")}
+                onClick={() => navTo("posts")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -977,7 +906,7 @@ export default function DashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("comments")}
+                onClick={() => navTo("comments")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1016,7 +945,7 @@ export default function DashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("books")}
+                onClick={() => navTo("books")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1039,7 +968,7 @@ export default function DashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("users")}
+                onClick={() => navTo("users")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1062,7 +991,7 @@ export default function DashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("schedule")}
+                onClick={() => navTo("schedule")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1097,7 +1026,7 @@ export default function DashboardPage() {
               </button>
 
               <button
-                onClick={() => setActiveTab("events")}
+                onClick={() => navTo("events")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1131,6 +1060,45 @@ export default function DashboardPage() {
             </>
           )}
 
+          {/* ── Site Nav (mobile only) ── */}
+          <div className="db-sitenav">
+            <div style={{ height: "1px", background: "#f1f5f9", margin: "0.75rem 0.75rem" }} />
+            <p style={{ fontSize: "0.7rem", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.08em", color: "#94a3b8", padding: "0 0.75rem", marginBottom: "0.5rem" }}>Site</p>
+            {[
+              { name: "Home", href: "/" },
+              { name: "Biography", href: "/about" },
+              { name: "Blog", href: "/blog" },
+              { name: "Books", href: "/books" },
+              { name: "Events", href: "/events" },
+              { name: "Services", href: "/services" },
+              { name: "Ministry", href: "/ministry" },
+              { name: "Legacy", href: "/legacy" },
+              { name: "Calendar", href: "/calendar" },
+              { name: "Contact", href: "/contact" },
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setSidebarOpen(false)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.65rem",
+                  width: "100%",
+                  padding: "0.55rem 0.75rem",
+                  borderRadius: "10px",
+                  textDecoration: "none",
+                  color: "#475569",
+                  fontWeight: "600",
+                  fontSize: "0.88rem",
+                  marginBottom: "2px",
+                }}
+              >
+                {link.name}
+              </a>
+            ))}
+          </div>
+
           {/* Sign out at bottom of sidebar */}
           <div style={{ height: "1px", background: "#f1f5f9", margin: "0.75rem 0.75rem" }} />
           <button
@@ -1157,7 +1125,7 @@ export default function DashboardPage() {
         </aside>
 
         {/* ── Main Content ── */}
-        <main style={{ flex: 1, minWidth: 0 }}>
+        <main className="db-main">
           {/* Tabs Navigation */}
 
 
@@ -1913,47 +1881,24 @@ export default function DashboardPage() {
           {/* ───────────────────────────────────────────────────────────── */}
           {activeTab === "posts" && (user.role === "admin" || user.role === "manager") && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem" }}>
-              {/* Post Creation / Editing Form */}
+              {/* Post Creation Form */}
               <div
-                id="post-form-card"
                 style={{
                   background: "#ffffff",
-                  border: editingPostId ? "2px solid #1e3a8a" : "1px solid #e2e8f0",
+                  border: "1px solid #e2e8f0",
                   borderRadius: "14px",
                   padding: "2rem",
-                  boxShadow: editingPostId ? "0 4px 16px rgba(30, 58, 138, 0.08)" : "0 2px 8px rgba(0,0,0,0.02)",
-                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                  <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", margin: 0 }}>
-                    {editingPostId ? "Edit Ministry Post" : "Publish New Ministry Post"}
-                  </h2>
-                  {editingPostId && (
-                    <span
-                      style={{
-                        background: "#fef3c7",
-                        color: "#b45309",
-                        fontSize: "0.75rem",
-                        fontWeight: "750",
-                        padding: "3px 10px",
-                        borderRadius: "999px",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.3rem",
-                      }}
-                    >
-                      <PenTool size={12} /> Editing Mode
-                    </span>
-                  )}
-                </div>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", marginBottom: "0.5rem" }}>
+                  Publish New Ministry Post
+                </h2>
                 <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-                  {editingPostId
-                    ? "Update the title, category, summary, or full content of this post. Changes will reflect immediately on the live blog."
-                    : "Compose and publish articles, sermons, or ministry announcements."}
+                  Compose and publish articles, sermons, or ministry announcements.
                 </p>
 
-                <form onSubmit={handleSavePost} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <form onSubmit={handleCreatePost} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
@@ -2004,7 +1949,7 @@ export default function DashboardPage() {
                     </label>
                     <textarea
                       required
-                      rows={8}
+                      rows={6}
                       placeholder="Write the full message, scripture references, and reflection..."
                       value={postContent}
                       onChange={(e) => setPostContent(e.target.value)}
@@ -2012,37 +1957,14 @@ export default function DashboardPage() {
                     />
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", flexWrap: "wrap" }}>
-                    <button
-                      type="submit"
-                      disabled={posting}
-                      className="button button-rust"
-                      style={{ minHeight: "44px", padding: "0 1.5rem" }}
-                    >
-                      {posting
-                        ? (editingPostId ? "Updating..." : "Publishing...")
-                        : (editingPostId ? "Save & Update Post" : "Publish Post")}
-                    </button>
-
-                    {editingPostId && (
-                      <button
-                        type="button"
-                        onClick={cancelEditingPost}
-                        className="button"
-                        style={{
-                          minHeight: "44px",
-                          padding: "0 1.25rem",
-                          background: "#ffffff",
-                          color: "#475569",
-                          border: "1px solid #cbd5e1",
-                          borderRadius: "6px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Cancel Edit
-                      </button>
-                    )}
-                  </div>
+                  <button
+                    type="submit"
+                    disabled={posting}
+                    className="button button-rust"
+                    style={{ alignSelf: "flex-start", minHeight: "44px", padding: "0 1.5rem" }}
+                  >
+                    {posting ? "Publishing..." : "Publish Post"}
+                  </button>
                 </form>
               </div>
 
@@ -2058,70 +1980,25 @@ export default function DashboardPage() {
                         <h4 style={{ margin: 0, fontSize: "1.05rem", color: "#0f172a" }}>{p.title}</h4>
                         <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{new Date(p.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <p style={{ margin: "0 0 0.75rem", fontSize: "0.88rem", color: "#475569" }}>{p.excerpt || p.content.slice(0, 140)}...</p>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem", paddingTop: "0.5rem", borderTop: "1px solid #f1f5f9" }}>
+                      <p style={{ margin: "0 0 0.5rem", fontSize: "0.88rem", color: "#475569" }}>{p.excerpt || p.content.slice(0, 140)}...</p>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem" }}>
                         <span style={{ fontSize: "0.75rem", background: "#f1f5f9", padding: "2px 8px", borderRadius: "4px", color: "#475569" }}>
                           {p.category}
                         </span>
-
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                          <button
-                            type="button"
-                            onClick={() => startEditingPost(p)}
-                            style={{
-                              fontSize: "0.8rem",
-                              fontWeight: "700",
-                              color: "#1e3a8a",
-                              background: "rgba(30, 58, 138, 0.08)",
-                              border: "1px solid rgba(30, 58, 138, 0.2)",
-                              borderRadius: "6px",
-                              padding: "4px 10px",
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0.3rem",
-                            }}
-                          >
-                            <PenTool size={12} /> Edit Post
-                          </button>
-
-                          <button
-                            type="button"
-                            disabled={deletingPostId === p._id}
-                            onClick={() => handleDeletePost(p._id, p.title)}
-                            style={{
-                              fontSize: "0.8rem",
-                              fontWeight: "600",
-                              color: "#b91c1c",
-                              background: "#ffffff",
-                              border: "1px solid #fecaca",
-                              borderRadius: "6px",
-                              padding: "4px 8px",
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0.3rem",
-                            }}
-                          >
-                            <Trash2 size={12} /> Delete
-                          </button>
-
-                          <Link
-                            href={`/blog/${p.slug || p._id}`}
-                            target="_blank"
-                            style={{
-                              fontSize: "0.8rem",
-                              fontWeight: "600",
-                              color: "#475569",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0.25rem",
-                              marginLeft: "0.25rem",
-                            }}
-                          >
-                            View Live <ExternalLink size={12} />
-                          </Link>
-                        </div>
+                        <Link
+                          href={`/blog/${p.slug || p._id}`}
+                          target="_blank"
+                          style={{
+                            fontSize: "0.8rem",
+                            fontWeight: "600",
+                            color: "#1e3a8a",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.25rem",
+                          }}
+                        >
+                          View Live Post <ExternalLink size={13} />
+                        </Link>
                       </div>
                     </div>
                   ))}
