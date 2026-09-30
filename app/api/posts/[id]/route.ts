@@ -32,12 +32,16 @@ export async function PUT(
     const { id } = await context.params;
     const body = await req.json();
 
-    await updatePost(id, {
+    const result = await updatePost(id, {
       title: body.title,
       excerpt: body.excerpt,
       content: body.content,
       category: body.category,
     });
+
+    if (result.matchedCount === 0) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
 
     return NextResponse.json({ success: true, message: "Post updated successfully" });
   } catch (error) {
@@ -57,7 +61,11 @@ export async function DELETE(
     }
 
     const { id } = await context.params;
-    await deletePost(id);
+    const result = await deletePost(id);
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
 
     return NextResponse.json({ success: true, message: "Post deleted successfully" });
   } catch (error) {

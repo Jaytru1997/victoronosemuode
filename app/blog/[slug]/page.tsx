@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, Clock, BookOpen, User, Tag, Share2 } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, BookOpen, User, Tag, Share2, PenTool } from "lucide-react";
 import { getPostBySlugOrId, getAllPosts } from "@/src/models/post";
+import { getSession, hasRole } from "@/src/lib/auth";
 import ShareButtons from "@/src/components/ShareButtons";
 import CommentsSection from "@/src/components/CommentsSection";
 
@@ -38,6 +39,9 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post) {
     notFound();
   }
+
+  const session = await getSession();
+  const canEdit = session && hasRole(session.role, ["admin", "manager"]);
 
   const postId = post._id ? post._id.toString() : slug;
   const postSlug = post.slug || postId;
@@ -83,7 +87,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           padding: "1rem 0",
         }}
       >
-        <div className="page-width" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="page-width" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
           <Link
             href="/blog"
             style={{
@@ -99,17 +103,40 @@ export default async function BlogPostPage({ params }: PageProps) {
             <ArrowLeft size={16} /> Back to all articles
           </Link>
 
-          <span
-            style={{
-              fontSize: "0.78rem",
-              fontWeight: "700",
-              color: "var(--muted, #5c6e66)",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            {post.category || "Ministry Article"}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+            {canEdit && (
+              <Link
+                href={`/dashboard?tab=posts&edit=${postId}`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  fontSize: "0.78rem",
+                  fontWeight: "750",
+                  color: "#1e3a8a",
+                  background: "rgba(30, 58, 138, 0.08)",
+                  border: "1px solid rgba(30, 58, 138, 0.2)",
+                  padding: "4px 10px",
+                  borderRadius: "6px",
+                  textDecoration: "none",
+                }}
+              >
+                <PenTool size={12} /> Edit Article
+              </Link>
+            )}
+
+            <span
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: "700",
+                color: "var(--muted, #5c6e66)",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+              }}
+            >
+              {post.category || "Ministry Article"}
+            </span>
+          </div>
         </div>
       </div>
 

@@ -204,6 +204,8 @@ export default function DashboardPage() {
   const [postExcerpt, setPostExcerpt] = useState("");
   const [postContent, setPostContent] = useState("");
   const [posting, setPosting] = useState(false);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
   // Comments moderation state
   const [commentsList, setCommentsList] = useState<CommentAdminItem[]>([]);
@@ -428,6 +430,26 @@ export default function DashboardPage() {
     }
   }, [user]);
 
+  // Handle URL query parameters (e.g. ?tab=posts&edit=POST_ID)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab") as TabType | null;
+      const editPostIdParam = params.get("edit");
+      if (tabParam) {
+        setActiveTab(tabParam);
+      }
+      if (editPostIdParam && posts.length > 0) {
+        const targetPost = posts.find(
+          (p) => p._id === editPostIdParam || p.slug === editPostIdParam
+        );
+        if (targetPost) {
+          startEditingPost(targetPost);
+        }
+      }
+    }
+  }, [posts]);
+
   // Admin Event Creation Handler
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -576,33 +598,101 @@ export default function DashboardPage() {
     }
   };
 
-  // Admin Post Creation Handler
-  const handleCreatePost = async (e: React.FormEvent) => {
+  // Post Editing & Creation Handlers
+  const startEditingPost = (p: PostItem) => {
+    setEditingPostId(p._id);
+    setPostTitle(p.title);
+    setPostCategory(p.category || "Ministry & Teachings");
+    setPostExcerpt(p.excerpt || "");
+    setPostContent(p.content);
+    setActiveTab("posts");
+    const formElement = document.getElementById("post-form-card");
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const cancelEditingPost = () => {
+    setEditingPostId(null);
+    setPostTitle("");
+    setPostCategory("Ministry & Teachings");
+    setPostExcerpt("");
+    setPostContent("");
+  };
+
+  const handleSavePost = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!postTitle.trim() || !postContent.trim()) {
+      error("Title and content are required.");
+      return;
+    }
     setPosting(true);
     try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: postTitle,
-          category: postCategory,
-          excerpt: postExcerpt,
-          content: postContent,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to publish post");
+      if (editingPostId) {
+        // Update existing post
+        const res = await fetch(`/api/posts/${editingPostId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: postTitle,
+            category: postCategory,
+            excerpt: postExcerpt,
+            content: postContent,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to update post");
 
-      success("Post published successfully!", { title: "Post Live" });
-      setPostTitle("");
-      setPostExcerpt("");
-      setPostContent("");
-      fetchPosts();
+        success("Post updated successfully!", { title: "Post Updated" });
+        cancelEditingPost();
+        fetchPosts();
+      } else {
+        // Publish new post
+        const res = await fetch("/api/posts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: postTitle,
+            category: postCategory,
+            excerpt: postExcerpt,
+            content: postContent,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to publish post");
+
+        success("Post published successfully!", { title: "Post Live" });
+        setPostTitle("");
+        setPostExcerpt("");
+        setPostContent("");
+        fetchPosts();
+      }
     } catch (err: unknown) {
-      error(err instanceof Error ? err.message : "Error publishing post");
+      error(err instanceof Error ? err.message : "Error saving post");
     } finally {
       setPosting(false);
+    }
+  };
+
+  const handleDeletePost = async (postId: string, title: string) => {
+    if (!confirm(`Are you sure you want to permanently delete "${title}"?`)) return;
+    setDeletingPostId(postId);
+    try {
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete post");
+
+      success("Post removed successfully", { title: "Post Deleted" });
+      if (editingPostId === postId) {
+        cancelEditingPost();
+      }
+      fetchPosts();
+    } catch (err: unknown) {
+      error(err instanceof Error ? err.message : "Error deleting post");
+    } finally {
+      setDeletingPostId(null);
     }
   };
 
@@ -1823,24 +1913,47 @@ export default function DashboardPage() {
           {/* ───────────────────────────────────────────────────────────── */}
           {activeTab === "posts" && (user.role === "admin" || user.role === "manager") && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem" }}>
-              {/* Post Creation Form */}
+              {/* Post Creation / Editing Form */}
               <div
+                id="post-form-card"
                 style={{
                   background: "#ffffff",
-                  border: "1px solid #e2e8f0",
+                  border: editingPostId ? "2px solid #1e3a8a" : "1px solid #e2e8f0",
                   borderRadius: "14px",
                   padding: "2rem",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
+                  boxShadow: editingPostId ? "0 4px 16px rgba(30, 58, 138, 0.08)" : "0 2px 8px rgba(0,0,0,0.02)",
+                  transition: "all 0.2s ease",
                 }}
               >
-                <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", marginBottom: "0.5rem" }}>
-                  Publish New Ministry Post
-                </h2>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                  <h2 style={{ fontSize: "1.25rem", fontWeight: "750", color: "#0f172a", margin: 0 }}>
+                    {editingPostId ? "Edit Ministry Post" : "Publish New Ministry Post"}
+                  </h2>
+                  {editingPostId && (
+                    <span
+                      style={{
+                        background: "#fef3c7",
+                        color: "#b45309",
+                        fontSize: "0.75rem",
+                        fontWeight: "750",
+                        padding: "3px 10px",
+                        borderRadius: "999px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                      }}
+                    >
+                      <PenTool size={12} /> Editing Mode
+                    </span>
+                  )}
+                </div>
                 <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-                  Compose and publish articles, sermons, or ministry announcements.
+                  {editingPostId
+                    ? "Update the title, category, summary, or full content of this post. Changes will reflect immediately on the live blog."
+                    : "Compose and publish articles, sermons, or ministry announcements."}
                 </p>
 
-                <form onSubmit={handleCreatePost} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <form onSubmit={handleSavePost} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#334155", marginBottom: "0.35rem" }}>
@@ -1891,7 +2004,7 @@ export default function DashboardPage() {
                     </label>
                     <textarea
                       required
-                      rows={6}
+                      rows={8}
                       placeholder="Write the full message, scripture references, and reflection..."
                       value={postContent}
                       onChange={(e) => setPostContent(e.target.value)}
@@ -1899,14 +2012,37 @@ export default function DashboardPage() {
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={posting}
-                    className="button button-rust"
-                    style={{ alignSelf: "flex-start", minHeight: "44px", padding: "0 1.5rem" }}
-                  >
-                    {posting ? "Publishing..." : "Publish Post"}
-                  </button>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", flexWrap: "wrap" }}>
+                    <button
+                      type="submit"
+                      disabled={posting}
+                      className="button button-rust"
+                      style={{ minHeight: "44px", padding: "0 1.5rem" }}
+                    >
+                      {posting
+                        ? (editingPostId ? "Updating..." : "Publishing...")
+                        : (editingPostId ? "Save & Update Post" : "Publish Post")}
+                    </button>
+
+                    {editingPostId && (
+                      <button
+                        type="button"
+                        onClick={cancelEditingPost}
+                        className="button"
+                        style={{
+                          minHeight: "44px",
+                          padding: "0 1.25rem",
+                          background: "#ffffff",
+                          color: "#475569",
+                          border: "1px solid #cbd5e1",
+                          borderRadius: "6px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
                 </form>
               </div>
 
@@ -1922,25 +2058,70 @@ export default function DashboardPage() {
                         <h4 style={{ margin: 0, fontSize: "1.05rem", color: "#0f172a" }}>{p.title}</h4>
                         <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{new Date(p.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <p style={{ margin: "0 0 0.5rem", fontSize: "0.88rem", color: "#475569" }}>{p.excerpt || p.content.slice(0, 140)}...</p>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem" }}>
+                      <p style={{ margin: "0 0 0.75rem", fontSize: "0.88rem", color: "#475569" }}>{p.excerpt || p.content.slice(0, 140)}...</p>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem", paddingTop: "0.5rem", borderTop: "1px solid #f1f5f9" }}>
                         <span style={{ fontSize: "0.75rem", background: "#f1f5f9", padding: "2px 8px", borderRadius: "4px", color: "#475569" }}>
                           {p.category}
                         </span>
-                        <Link
-                          href={`/blog/${p.slug || p._id}`}
-                          target="_blank"
-                          style={{
-                            fontSize: "0.8rem",
-                            fontWeight: "600",
-                            color: "#1e3a8a",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.25rem",
-                          }}
-                        >
-                          View Live Post <ExternalLink size={13} />
-                        </Link>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                          <button
+                            type="button"
+                            onClick={() => startEditingPost(p)}
+                            style={{
+                              fontSize: "0.8rem",
+                              fontWeight: "700",
+                              color: "#1e3a8a",
+                              background: "rgba(30, 58, 138, 0.08)",
+                              border: "1px solid rgba(30, 58, 138, 0.2)",
+                              borderRadius: "6px",
+                              padding: "4px 10px",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem",
+                            }}
+                          >
+                            <PenTool size={12} /> Edit Post
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={deletingPostId === p._id}
+                            onClick={() => handleDeletePost(p._id, p.title)}
+                            style={{
+                              fontSize: "0.8rem",
+                              fontWeight: "600",
+                              color: "#b91c1c",
+                              background: "#ffffff",
+                              border: "1px solid #fecaca",
+                              borderRadius: "6px",
+                              padding: "4px 8px",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.3rem",
+                            }}
+                          >
+                            <Trash2 size={12} /> Delete
+                          </button>
+
+                          <Link
+                            href={`/blog/${p.slug || p._id}`}
+                            target="_blank"
+                            style={{
+                              fontSize: "0.8rem",
+                              fontWeight: "600",
+                              color: "#475569",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.25rem",
+                              marginLeft: "0.25rem",
+                            }}
+                          >
+                            View Live <ExternalLink size={12} />
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   ))}

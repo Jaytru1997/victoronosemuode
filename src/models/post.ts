@@ -91,14 +91,26 @@ export async function updatePost(
   updates: Partial<Omit<Post, "_id" | "createdAt" | "updatedAt">>
 ) {
   const collection = await getPostsCollection();
-  return collection.updateOne(
-    { _id: new ObjectId(id) },
-    { $set: { ...updates, updatedAt: new Date() } }
-  );
+  const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { slug: id };
+
+  const updateFields: Partial<Post> = {
+    ...updates,
+    updatedAt: new Date(),
+  };
+
+  if (updates.title && !updates.slug) {
+    updateFields.slug = updates.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+  }
+
+  return collection.updateOne(query, { $set: updateFields });
 }
 
 /** Delete a post */
 export async function deletePost(id: string) {
   const collection = await getPostsCollection();
-  return collection.deleteOne({ _id: new ObjectId(id) });
+  const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { slug: id };
+  return collection.deleteOne(query);
 }
