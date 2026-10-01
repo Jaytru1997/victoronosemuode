@@ -334,24 +334,22 @@ img {
   color: var(--white);
 }
 
-.hero-image,
 .culture-image,
 .expand-image {
   object-fit: cover;
 }
 
 .hero-image {
-  object-position: 58% 38%;
-}
-
-.hero-image {
-  object-fit: cover;
+  object-fit: contain;
+  object-position: 85% bottom;
+  z-index: 0;
 }
 
 .hero-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(15, 37, 31, .88) 0%, rgba(15, 37, 31, .68) 46%, rgba(15, 37, 31, .15) 100%);
+  background: linear-gradient(90deg, rgba(15, 37, 31, .95) 0%, rgba(15, 37, 31, .75) 45%, rgba(15, 37, 31, .1) 85%);
+  pointer-events: none;
 }
 
 .hero-content {
@@ -2108,15 +2106,17 @@ img {
   position: absolute;
   z-index: 0;
   inset: 0;
-  object-fit: cover;
-  object-position: center 38%;
+  object-fit: contain;
+  object-position: 88% bottom;
+  opacity: 0.38;
 }
 
 .inner-hero-shade {
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: linear-gradient(90deg, rgba(15, 37, 31, .9), rgba(15, 37, 31, .65) 60%, rgba(15, 37, 31, .18));
+  background: linear-gradient(90deg, rgba(15, 37, 31, .92) 0%, rgba(15, 37, 31, .68) 55%, rgba(15, 37, 31, .15) 100%);
+  pointer-events: none;
 }
 
 .inner-hero-copy {
@@ -2376,11 +2376,13 @@ img {
   }
 
   .hero-image {
-    object-position: 62% center;
+    object-fit: contain;
+    object-position: center 12%;
+    opacity: 0.42;
   }
 
   .hero-shade {
-    background: linear-gradient(0deg, rgba(20, 19, 17, .92), rgba(20, 19, 17, .55) 60%, rgba(20, 19, 17, .14));
+    background: linear-gradient(0deg, rgba(15, 37, 31, .98) 0%, rgba(15, 37, 31, .78) 55%, rgba(15, 37, 31, .2) 100%);
   }
 
   .hero-content {
@@ -4182,5 +4184,28 @@ img {
     overflow-y: visible;
     padding-top: 0.5rem;
   }
+}
+
+/* Events Category Tags Slider */
+.events-tags-slider {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.events-tags-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.tags-slider-arrow {
+  box-shadow: 0 2px 8px rgba(23, 58, 50, 0.12);
+}
+
+.tags-slider-arrow:hover {
+  background: #ffffff !important;
+  border-color: var(--rust, #a64b32) !important;
+  color: var(--rust, #a64b32) !important;
+  transform: translateY(-50%) scale(1.08) !important;
+  box-shadow: 0 4px 12px rgba(166, 75, 50, 0.22) !important;
 }
 

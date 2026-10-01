@@ -13,7 +13,7 @@ export default function SectionPage({ eyebrow, title, description, children }: S
   return (
     <>
       <section className="inner-hero">
-        <Image src={referenceImages.hero} alt="Temporary reference-site hero image; replace with a photograph of Victor" fill sizes="100vw" className="inner-hero-image" />
+        <Image src={referenceImages.hero} alt="Ven. Victor Akpevwen Onosemuode (Rtd.)" fill sizes="100vw" className="inner-hero-image" priority />
         <div className="inner-hero-shade" />
         <div className="page-width inner-hero-copy">
           <p className="eyebrow">{eyebrow}</p>

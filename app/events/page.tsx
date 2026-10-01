@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -17,6 +17,8 @@ import {
   Sparkles,
   Plus,
   Image as ImageIcon,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useAuth } from "@/src/context/AuthContext";
 import { useToast } from "@/src/context/ToastContext";
@@ -49,6 +51,46 @@ export default function EventsPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+
+  // Category tags slider
+  const tagsSliderRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScrollability = useCallback(() => {
+    const el = tagsSliderRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 6);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
+  }, []);
+
+  useEffect(() => {
+    const el = tagsSliderRef.current;
+    if (!el) return;
+
+    checkScrollability();
+    const timer = setTimeout(checkScrollability, 150);
+
+    el.addEventListener("scroll", checkScrollability, { passive: true });
+    window.addEventListener("resize", checkScrollability);
+
+    return () => {
+      clearTimeout(timer);
+      el.removeEventListener("scroll", checkScrollability);
+      window.removeEventListener("resize", checkScrollability);
+    };
+  }, [checkScrollability]);
+
+  const slideTags = (direction: "left" | "right") => {
+    const el = tagsSliderRef.current;
+    if (!el) return;
+    const scrollAmount = Math.max(el.clientWidth * 0.65, 180);
+    el.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
 
   // Reservation modal states
   const [activeModalEvent, setActiveModalEvent] = useState<EventItem | null>(null);
@@ -303,37 +345,152 @@ export default function EventsPage() {
 
       {/* Main Content Area */}
       <div className="page-width" style={{ marginTop: "2.5rem" }}>
-        {/* Category Filters */}
-        <div
-          style={{
-            display: "flex",
-            gap: "0.5rem",
-            flexWrap: "wrap",
-            marginBottom: "2rem",
-            paddingBottom: "0.75rem",
-            borderBottom: "1px solid var(--line, #d8ddd6)",
-          }}
-        >
-          {categories.map((cat) => (
+        {/* Category Filters Slider */}
+        <div style={{ position: "relative", marginBottom: "2rem" }}>
+          {/* Left Slide Arrow */}
+          {canScrollLeft && (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
+              type="button"
+              onClick={() => slideTags("left")}
+              aria-label="Slide tags left"
+              className="tags-slider-arrow tags-slider-arrow-left"
               style={{
-                padding: "0.45rem 1rem",
-                borderRadius: "999px",
-                border: "1px solid",
-                borderColor: selectedCategory === cat ? "var(--rust, #a64b32)" : "var(--line, #d8ddd6)",
-                background: selectedCategory === cat ? "var(--rust, #a64b32)" : "#ffffff",
-                color: selectedCategory === cat ? "#ffffff" : "var(--ink, #173a32)",
-                fontSize: "0.85rem",
-                fontWeight: "700",
+                position: "absolute",
+                left: "-0.25rem",
+                top: "calc(50% - 0.35rem)",
+                transform: "translateY(-50%)",
+                zIndex: 4,
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                background: "#ffffff",
+                border: "1px solid var(--line, #d8ddd6)",
+                boxShadow: "0 2px 8px rgba(23, 58, 50, 0.14)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--ink, #173a32)",
                 cursor: "pointer",
                 transition: "all 0.2s ease",
               }}
             >
-              {cat}
+              <ChevronLeft size={16} />
             </button>
-          ))}
+          )}
+
+          {/* Left Fade Gradient */}
+          {canScrollLeft && (
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                bottom: "0.75rem",
+                width: "36px",
+                background: "linear-gradient(to right, var(--paper, #f8f7f1) 25%, transparent 100%)",
+                zIndex: 2,
+                pointerEvents: "none",
+              }}
+            />
+          )}
+
+          {/* Right Slide Arrow */}
+          {canScrollRight && (
+            <button
+              type="button"
+              onClick={() => slideTags("right")}
+              aria-label="Slide tags right"
+              className="tags-slider-arrow tags-slider-arrow-right"
+              style={{
+                position: "absolute",
+                right: "-0.25rem",
+                top: "calc(50% - 0.35rem)",
+                transform: "translateY(-50%)",
+                zIndex: 4,
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                background: "#ffffff",
+                border: "1px solid var(--line, #d8ddd6)",
+                boxShadow: "0 2px 8px rgba(23, 58, 50, 0.14)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--ink, #173a32)",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <ChevronRight size={16} />
+            </button>
+          )}
+
+          {/* Right Fade Gradient */}
+          {canScrollRight && (
+            <div
+              style={{
+                position: "absolute",
+                right: 0,
+                top: 0,
+                bottom: "0.75rem",
+                width: "36px",
+                background: "linear-gradient(to left, var(--paper, #f8f7f1) 25%, transparent 100%)",
+                zIndex: 2,
+                pointerEvents: "none",
+              }}
+            />
+          )}
+
+          {/* Horizontal Slider Track */}
+          <div
+            ref={tagsSliderRef}
+            className="events-tags-slider"
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+              overflowX: "auto",
+              scrollBehavior: "smooth",
+              paddingBottom: "0.75rem",
+              paddingTop: "0.25rem",
+              paddingLeft: canScrollLeft ? "2rem" : "0.25rem",
+              paddingRight: canScrollRight ? "2rem" : "0.25rem",
+              borderBottom: "1px solid var(--line, #d8ddd6)",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={(e) => {
+                  setSelectedCategory(cat);
+                  (e.currentTarget as HTMLElement).scrollIntoView({
+                    behavior: "smooth",
+                    inline: "center",
+                    block: "nearest",
+                  });
+                }}
+                style={{
+                  padding: "0.45rem 1rem",
+                  borderRadius: "999px",
+                  border: "1px solid",
+                  borderColor: selectedCategory === cat ? "var(--rust, #a64b32)" : "var(--line, #d8ddd6)",
+                  background: selectedCategory === cat ? "var(--rust, #a64b32)" : "#ffffff",
+                  color: selectedCategory === cat ? "#ffffff" : "var(--ink, #173a32)",
+                  fontSize: "0.85rem",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Events List */}
