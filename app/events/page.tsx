@@ -19,7 +19,16 @@ import {
   Image as ImageIcon,
   ChevronLeft,
   ChevronRight,
+  Download,
+  ExternalLink,
+  CalendarPlus,
 } from "lucide-react";
+import {
+  generateICS,
+  generateGoogleCalendarURL,
+  generateOutlookURL,
+  type ICSEvent,
+} from "@/src/lib/ics";
 import { useAuth } from "@/src/context/AuthContext";
 import { useToast } from "@/src/context/ToastContext";
 
@@ -46,6 +55,39 @@ const PRESET_POSTERS = [
   { label: "My Patmos Devotional", value: "/my-patmos-poster.png" },
   { label: "Historical Encounter", value: "/historical-encounter-poster.webp" },
 ];
+
+/**
+ * Parse a human-readable event date+time string into a JS Date.
+ * Handles formats like "Saturday, 15 November 2026" + "10:00 AM WAT".
+ * Falls back gracefully if parsing fails.
+ */
+function parseEventDateTime(dateStr: string, timeStr: string): Date {
+  // Strip day-of-week prefix if present (e.g. "Saturday, ")
+  const cleanDate = dateStr.replace(/^\w+,\s*/, "");
+  // Strip timezone abbreviation (e.g. " WAT", " GMT") from time
+  const cleanTime = timeStr.replace(/\s+[A-Z]{2,5}$/i, "");
+  const combined = `${cleanDate} ${cleanTime}`;
+  const parsed = new Date(combined);
+  if (!isNaN(parsed.getTime())) return parsed;
+  // Fallback: try date string alone
+  const fallback = new Date(cleanDate);
+  return isNaN(fallback.getTime()) ? new Date() : fallback;
+}
+
+/** Convert an EventItem into the ICSEvent shape the utility expects. */
+function eventToICS(event: EventItem): ICSEvent {
+  const start = parseEventDateTime(event.date, event.time);
+  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // default 2 hours
+  return {
+    uid: `event-${event._id}@victoronosemuode.com`,
+    summary: event.title,
+    description: [event.theme ? `Theme: ${event.theme}` : "", event.description].filter(Boolean).join("\n\n"),
+    location: `${event.venue}${event.location && event.location !== event.venue ? `, ${event.location}` : ""}`,
+    startTime: start,
+    endTime: end,
+    status: "CONFIRMED",
+  };
+}
 
 export default function EventsPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -119,10 +161,57 @@ export default function EventsPage() {
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [addEventError, setAddEventError] = useState<string | null>(null);
 
+  // "Add to Calendar" dropdown state
+  const [calendarDropdownId, setCalendarDropdownId] = useState<string | null>(null);
+  const calendarDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close calendar dropdown on click outside
+  useEffect(() => {
+    if (!calendarDropdownId) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (calendarDropdownRef.current && !calendarDropdownRef.current.contains(e.target as Node)) {
+        setCalendarDropdownId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [calendarDropdownId]);
+
   const { user } = useAuth();
   const { success, error } = useToast();
 
   const isManagerOrAdmin = user?.role === "admin" || user?.role === "manager";
+
+  /** Download .ics file for a given event */
+  const handleDownloadICS = (event: EventItem) => {
+    try {
+      const icsEvent = eventToICS(event);
+      const icsContent = generateICS(icsEvent);
+      const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${event.title.replace(/[^a-zA-Z0-9]/g, "_")}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      success("Calendar file downloaded!");
+      setCalendarDropdownId(null);
+    } catch {
+      error("Failed to generate calendar file.");
+    }
+  };
+
+  /** Get Google Calendar URL for an event */
+  const getGoogleCalURL = (event: EventItem) => {
+    return generateGoogleCalendarURL(eventToICS(event));
+  };
+
+  /** Get Outlook Calendar URL for an event */
+  const getOutlookCalURL = (event: EventItem) => {
+    return generateOutlookURL(eventToICS(event));
+  };
 
   const fetchEvents = async () => {
     try {
@@ -521,7 +610,6 @@ export default function EventsPage() {
                     borderRadius: "16px",
                     border: "1px solid var(--line, #d8ddd6)",
                     boxShadow: "0 6px 20px rgba(23, 58, 50, 0.05)",
-                    overflow: "hidden",
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr",
                   }}
@@ -540,6 +628,7 @@ export default function EventsPage() {
                       alignItems: "center",
                       justifyContent: "center",
                       overflow: "hidden",
+                      borderRadius: "16px 0 0 16px",
                     }}
                   >
                     <Image
@@ -724,21 +813,147 @@ export default function EventsPage() {
                       <span style={{ fontSize: "0.85rem", color: "#64748b" }}>
                         Auditorium Capacity: {event.capacity} seats
                       </span>
-                      <button
-                        onClick={() => handleOpenReserve(event)}
-                        disabled={isFull}
-                        className="button button-rust"
-                        style={{
-                          minHeight: "44px",
-                          padding: "0 1.4rem",
-                          fontSize: "0.85rem",
-                          borderRadius: "8px",
-                          opacity: isFull ? 0.6 : 1,
-                          cursor: isFull ? "not-allowed" : "pointer",
-                        }}
-                      >
-                        <Ticket size={16} /> Reserve a Seat
-                      </button>
+                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                        {/* Add to Calendar dropdown */}
+                        <div ref={calendarDropdownRef} style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCalendarDropdownId(
+                                calendarDropdownId === event._id ? null : event._id
+                              )
+                            }
+                            className="button button-ghost"
+                            style={{
+                              minHeight: "44px",
+                              padding: "0 1rem",
+                              fontSize: "0.82rem",
+                              borderRadius: "8px",
+                              border: "1px solid var(--line, #d8ddd6)",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.4rem",
+                              background: calendarDropdownId === event._id ? "var(--paper, #f8f7f1)" : "#ffffff",
+                              color: "var(--ink, #173a32)",
+                              cursor: "pointer",
+                              transition: "all 0.2s ease",
+                            }}
+                          >
+                            <CalendarPlus size={15} /> Add to Calendar
+                          </button>
+
+                          {/* Dropdown menu */}
+                          {calendarDropdownId === event._id && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                right: 0,
+                                bottom: "calc(100% + 6px)",
+                                background: "#ffffff",
+                                border: "1px solid var(--line, #d8ddd6)",
+                                borderRadius: "10px",
+                                boxShadow: "0 8px 24px rgba(23, 58, 50, 0.15)",
+                                zIndex: 100,
+                                minWidth: "220px",
+                                overflow: "hidden",
+                                animation: "fadeIn 0.15s ease",
+                              }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => handleDownloadICS(event)}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "0.6rem",
+                                  width: "100%",
+                                  padding: "0.7rem 1rem",
+                                  border: "none",
+                                  background: "transparent",
+                                  cursor: "pointer",
+                                  fontSize: "0.85rem",
+                                  color: "var(--ink, #173a32)",
+                                  transition: "background 0.15s ease",
+                                  textAlign: "left",
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--paper, #f8f7f1)")}
+                                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                              >
+                                <Download size={15} color="var(--rust, #a64b32)" />
+                                <span>Download .ICS File</span>
+                              </button>
+                              <div style={{ height: "1px", background: "var(--line, #d8ddd6)" }} />
+                              <a
+                                href={getGoogleCalURL(event)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => setCalendarDropdownId(null)}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "0.6rem",
+                                  width: "100%",
+                                  padding: "0.7rem 1rem",
+                                  border: "none",
+                                  background: "transparent",
+                                  cursor: "pointer",
+                                  fontSize: "0.85rem",
+                                  color: "var(--ink, #173a32)",
+                                  textDecoration: "none",
+                                  transition: "background 0.15s ease",
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--paper, #f8f7f1)")}
+                                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                              >
+                                <ExternalLink size={15} color="#4285f4" />
+                                <span>Google Calendar</span>
+                              </a>
+                              <div style={{ height: "1px", background: "var(--line, #d8ddd6)" }} />
+                              <a
+                                href={getOutlookCalURL(event)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => setCalendarDropdownId(null)}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "0.6rem",
+                                  width: "100%",
+                                  padding: "0.7rem 1rem",
+                                  border: "none",
+                                  background: "transparent",
+                                  cursor: "pointer",
+                                  fontSize: "0.85rem",
+                                  color: "var(--ink, #173a32)",
+                                  textDecoration: "none",
+                                  transition: "background 0.15s ease",
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--paper, #f8f7f1)")}
+                                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                              >
+                                <ExternalLink size={15} color="#0078d4" />
+                                <span>Outlook Calendar</span>
+                              </a>
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          onClick={() => handleOpenReserve(event)}
+                          disabled={isFull}
+                          className="button button-rust"
+                          style={{
+                            minHeight: "44px",
+                            padding: "0 1.4rem",
+                            fontSize: "0.85rem",
+                            borderRadius: "8px",
+                            opacity: isFull ? 0.6 : 1,
+                            cursor: isFull ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          <Ticket size={16} /> Reserve a Seat
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </article>
