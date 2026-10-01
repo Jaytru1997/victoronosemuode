@@ -163,13 +163,12 @@ export default function EventsPage() {
 
   // "Add to Calendar" dropdown state
   const [calendarDropdownId, setCalendarDropdownId] = useState<string | null>(null);
-  const calendarDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close calendar dropdown on click outside
   useEffect(() => {
     if (!calendarDropdownId) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (calendarDropdownRef.current && !calendarDropdownRef.current.contains(e.target as Node)) {
+      if (e.target instanceof Element && !e.target.closest("[data-calendar-dropdown]")) {
         setCalendarDropdownId(null);
       }
     };
@@ -815,14 +814,12 @@ export default function EventsPage() {
                       </span>
                       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
                         {/* Add to Calendar dropdown */}
-                        <div ref={calendarDropdownRef} style={{ position: "relative" }}>
+                        <div data-calendar-dropdown style={{ position: "relative" }}>
                           <button
                             type="button"
-                            onClick={() =>
-                              setCalendarDropdownId(
-                                calendarDropdownId === event._id ? null : event._id
-                              )
-                            }
+                            onClick={() => setCalendarDropdownId((openId) =>
+                              openId === event._id ? null : event._id
+                            )}
                             className="button button-ghost"
                             style={{
                               minHeight: "44px",
