@@ -285,6 +285,8 @@ img {
   display: none;
   width: 42px;
   height: 42px;
+  min-width: 42px;
+  box-sizing: border-box;
   place-items: center;
   border: 1px solid var(--line);
   background: transparent;
@@ -295,10 +297,15 @@ img {
 .mobile-header-cart {
   display: none;
   align-items: center;
+  justify-content: center;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  box-sizing: border-box;
   gap: 6px;
   background: transparent;
   border: 1px solid var(--line);
-  padding: 8px 12px;
+  padding: 0;
   cursor: pointer;
   font-family: inherit;
   font-size: 11px;
@@ -3353,7 +3360,7 @@ img {
 /* ── Month Grid ── */
 .cal-month-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
@@ -3362,6 +3369,7 @@ img {
 }
 
 .cal-day-header {
+  min-width: 0;
   padding: 0.75rem 0.5rem;
   text-align: center;
   font-size: 0.75rem;
@@ -3374,6 +3382,7 @@ img {
 }
 
 .cal-day-cell {
+  min-width: 0;
   min-height: 80px;
   padding: 0.4rem;
   border: none;
@@ -3429,6 +3438,8 @@ img {
 }
 
 .cal-day-dots {
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 3px;
@@ -3451,7 +3462,7 @@ img {
 /* ── Week Grid ── */
 .cal-week-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0;
   background: #ffffff;
   border-radius: 12px;
@@ -3461,6 +3472,7 @@ img {
 }
 
 .cal-week-column {
+  min-width: 0;
   min-height: 200px;
   border-right: 1px solid #f1f5f9;
   padding: 0;
@@ -3520,6 +3532,7 @@ img {
 }
 
 .cal-week-events {
+  min-width: 0;
   padding: 0.5rem 0.35rem;
   display: flex;
   flex-direction: column;
@@ -3536,6 +3549,9 @@ img {
 .cal-event-chip {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   gap: 2px;
   padding: 0.3rem 0.4rem;
   background: #f8fafc;
@@ -3558,12 +3574,39 @@ img {
 }
 
 .cal-event-title {
+  display: block;
+  width: 100%;
+  min-width: 0;
   font-size: 0.75rem;
   color: #0f172a;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cal-speaking-event-content {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.cal-speaking-event-title,
+.cal-sidebar-event-title {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal-sidebar-event-title {
+  flex: 1 1 auto;
+}
+
+.cal-speaking-event-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Day View ── */
@@ -4282,7 +4325,7 @@ img {
 
   /* Week: stack instead of horizontal */
   .cal-week-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .cal-week-column {

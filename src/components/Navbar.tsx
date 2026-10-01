@@ -126,7 +126,7 @@ export default function Navbar() {
             aria-label={`Open cart with ${totalItems} items`}
             title={`Cart (${totalItems} items)`}
           >
-            <ShoppingBag size={18} />
+            <ShoppingBag size={20} />
             {totalItems > 0 && (
               <span
                 style={{
@@ -168,11 +168,11 @@ export default function Navbar() {
             type="button"
             onClick={openCart}
             className="mobile-header-cart"
-            style={{ position: "relative", padding: "7px 9px" }}
+            style={{ position: "relative" }}
             aria-label={`Open cart with ${totalItems} items`}
             title={`Cart (${totalItems} items)`}
           >
-            <ShoppingBag size={18} />
+            <ShoppingBag size={20} />
             {totalItems > 0 && (
               <span
                 style={{

@@ -822,6 +822,8 @@ export default function CalendarPage() {
                         }}
                         style={{
                           width: "92%",
+                          minWidth: 0,
+                          boxSizing: "border-box",
                           fontSize: "9px",
                           fontWeight: "750",
                           padding: "1px 4px",
@@ -891,6 +893,7 @@ export default function CalendarPage() {
                       <button
                         key={ev._id}
                         className="cal-event-chip"
+                        title={ev.title}
                         style={{
                           borderLeft: "3px solid #f59e0b",
                           background: "#fffbeb",
@@ -967,6 +970,7 @@ export default function CalendarPage() {
                   {eventsForDay(currentDate).map((ev) => (
                     <div
                       key={ev._id}
+                      className="cal-speaking-event-card"
                       onClick={() => {
                         setSelectedEvent(ev);
                         setShowEventModal(true);
@@ -983,7 +987,7 @@ export default function CalendarPage() {
                         gap: "1rem",
                       }}
                     >
-                      <div>
+                      <div className="cal-speaking-event-content">
                         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
                           <span style={{ fontSize: "0.75rem", fontWeight: "800", background: "#fef3c7", color: "#b45309", padding: "2px 8px", borderRadius: "999px" }}>
                             {ev.category || "Event"}
@@ -992,10 +996,10 @@ export default function CalendarPage() {
                             {ev.time}
                           </span>
                         </div>
-                        <h4 style={{ fontSize: "1.05rem", fontWeight: "700", color: "#78350f", margin: "0 0 0.25rem" }}>
+                        <h4 className="cal-speaking-event-title" title={ev.title} style={{ fontSize: "1.05rem", fontWeight: "700", color: "#78350f", margin: "0 0 0.25rem" }}>
                           {ev.title}
                         </h4>
-                        <p style={{ margin: 0, fontSize: "0.85rem", color: "#a16207" }}>
+                        <p className="cal-speaking-event-meta" style={{ margin: 0, fontSize: "0.85rem", color: "#a16207" }}>
                           📍 {ev.venue} • {ev.clientRole || "Attendee"}
                         </p>
                       </div>
@@ -1125,7 +1129,7 @@ export default function CalendarPage() {
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.25rem" }}>
-                      <span style={{ fontSize: "0.9rem", fontWeight: "750", color: "#78350f" }}>
+                      <span className="cal-sidebar-event-title" title={ev.title} style={{ fontSize: "0.9rem", fontWeight: "750", color: "#78350f" }}>
                         {ev.title}
                       </span>
                       <span style={{ fontSize: "0.75rem", fontWeight: "700", background: "#fef3c7", color: "#b45309", padding: "1px 6px", borderRadius: "4px" }}>
