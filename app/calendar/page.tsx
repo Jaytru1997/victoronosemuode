@@ -1108,7 +1108,7 @@ export default function CalendarPage() {
 
           {/* Speaking events on selected date */}
           {eventsForSelectedDate.length > 0 && (
-            <div style={{ marginBottom: "1.25rem" }}>
+            <div style={{ marginBottom: "2rem" }}>
               <div style={{ fontSize: "0.8rem", fontWeight: "800", textTransform: "uppercase", color: "#b45309", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
                 Events ({eventsForSelectedDate.length})
               </div>
@@ -1449,7 +1449,7 @@ export default function CalendarPage() {
 
       {/* ══════════════════ MODAL: SPEAKING EVENT DETAILS ══════════════════ */}
       {showEventModal && selectedEvent && (
-        <div className="cal-modal-overlay" onClick={() => setShowEventModal(false)}>
+        <div className="cal-modal-overlay mt-5" onClick={() => setShowEventModal(false)}>
           <div
             className="cal-modal"
             style={{ maxWidth: "680px", padding: "0", overflow: "hidden" }}
